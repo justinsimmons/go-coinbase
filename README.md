@@ -1,6 +1,8 @@
 # go-coinbase
 Go SDK for Coinbase's Advanced Trade REST API 
 
+*This Repo is under active development and should be considered VERY unstable. Please wait until v1.0.0 release to use in any proffessional setting.*
+
 This does not include the [Advanced Trade WebSocket]https://docs.cloud.coinbase.com/advanced-trade-api/docs/ws-overview).
 
 [API Documentation](https://docs.cloud.coinbase.com/advanced-trade-api/docs/rest-api-overview)
@@ -9,9 +11,9 @@ This does not include the [Advanced Trade WebSocket]https://docs.cloud.coinbase.
 
 | API | Description | Supported |
 | --- | ----------- | --------- |
-| [List Accounts] (https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getaccounts) | Get a list of authenticated accounts for the current user. | - |
-| [Get Account] (https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getaccount) |Get a list of information about an account, given an account UUID. | X |
-| [Create Order] (https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_postorder) | Create an order with a specified product_id (asset-pair), side (buy/sell), etc. | X |
+| [List Accounts](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getaccounts) | Get a list of authenticated accounts for the current user. | - |
+| [Get Account](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getaccount) |Get a list of information about an account, given an account UUID. | X |
+| [Create Order](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_postorder) | Create an order with a specified product_id (asset-pair), side (buy/sell), etc. | X |
 
 ## Order Management
 
