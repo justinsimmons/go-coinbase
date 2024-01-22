@@ -1,7 +1,8 @@
-module github.com/justsimmons/go-coinbase
+module github.com/justinsimmons/go-coinbase
 
-go 1.21
+go 1.21.6
 
-require github.com/google/uuid v1.3.1
-
-require github.com/google/go-querystring v1.1.0 // indirect
+require (
+	github.com/google/go-querystring v1.1.0
+	github.com/google/uuid v1.5.0
+)
