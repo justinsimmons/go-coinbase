@@ -1,4 +1,4 @@
-package cb
+package coinbase
 
 import (
 	"bytes"

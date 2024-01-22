@@ -1,4 +1,4 @@
-package cb
+package coinbase
 
 import (
 	"fmt"
@@ -49,11 +49,10 @@ func (e CoinbaseError) Error() string {
 	for i, detail := range e.Details {
 		details.WriteString(fmt.Sprintf(`{"type_url": "%s", "value": %v}`, detail.TypeUrl, detail.Value))
 
-		if i < n - 1 {
+		if i < n-1 {
 			details.WriteString(", ")
 		}
 	}
-
 
 	details.WriteRune(']')
 

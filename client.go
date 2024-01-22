@@ -1,4 +1,4 @@
-package cb
+package coinbase
 
 import "net/http"
 
@@ -14,8 +14,9 @@ type Client struct {
 	baseURL    string       // Base URL of the Advanced Trade REST API.
 	httpClient *http.Client // Client used to make HTTP calls.
 
-	Accounts *AccountService // Interface with the Advanced Trade REST API Accounts APIs.
-	Orders   *OrdersService  // Interface with the Advanced Trade REST API Orders APIs.
+	Accounts *AccountService  // Interface with the Advanced Trade REST API Accounts APIs.
+	Orders   *OrdersService   // Interface with the Advanced Trade REST API Orders APIs.
+	Products *ProductsService // Interface with the Advanced Trade REST API Bid/Ask API.
 }
 
 type service struct {
@@ -63,6 +64,7 @@ func New(apiKey string, apiSecret string, opts ...option) *Client {
 
 	c.Accounts = (*AccountService)(&commonService)
 	c.Orders = (*OrdersService)(&commonService)
+	c.Products = (*ProductsService)(&commonService)
 
 	for _, opt := range opts {
 		if opt != nil {

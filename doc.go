@@ -5,4 +5,4 @@
 //
 // Coinbase Advanced replaced Coinbase Pro as the "advanced" trading platform.
 // The Coinbase Advanced API lets you manage orders, products, and fees with the new v3 endpoints. It does not duplicate core Coinbase functions for account deposits, withdrawals, and transactions. The Coinbase Advanced REST API supports advanced trading features only.
-package cb
+package coinbase

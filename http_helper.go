@@ -1,7 +1,6 @@
-package cb
+package coinbase
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -11,23 +10,6 @@ import (
 
 // ErrUnexpectedAPIResponse - coinbase API returned a response outside the API documetation.
 var ErrUnexpectedAPIResponse = errors.New("coinbase API returned a response outside the API documetation")
-
-// Generic unmarshaler for HTTP responses.
-func unmarshal(resp *http.Response, in any) error {
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return fmt.Errorf("failed to read response body: %w", err)
-	}
-
-	// TODO: Pipe response into string for better logging.
-
-	err = json.Unmarshal(body, in)
-	if err != nil {
-		return fmt.Errorf("failed to unmarshal HTTP response body into '%T': %w", in, err)
-	}
-
-	return nil
-}
 
 func handleRequestError(resp *http.Response) error {
 	if resp == nil {
@@ -58,16 +40,32 @@ func handleRequestError(resp *http.Response) error {
 	return &cbError
 }
 
-func (c *Client) newRequest(ctx context.Context, method string, url string, body io.Reader) (*http.Request, error) {
-	req, err := http.NewRequestWithContext(ctx, method, url, body)
+func (c *Client) do(r *http.Request, successCode int, v any) error {
+	// Add reurired authentication to request.
+	c.authenticate(r)
+
+	r.Header.Add("Accept", "application/json")
+
+	resp, err := c.httpClient.Do(r)
 	if err != nil {
-		return req, fmt.Errorf("failed to create HTTP request: %w", err)
+		return fmt.Errorf("failed HTTP request to Coinbase API: %w", err)
 	}
 
-	// Add reurired authentication to request.
-	c.authenticate(req)
+	defer resp.Body.Close()
 
-	req.Header.Add("Accept", "application/json")
+	if resp.StatusCode != successCode {
+		return handleRequestError(resp)
+	}
 
-	return req, nil
+	buf, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("failed to read response body: %w", err)
+	}
+
+	err = json.Unmarshal(buf, v)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal HTTP response '%s' into '%T': %w", buf, v, err)
+	}
+
+	return nil
 }

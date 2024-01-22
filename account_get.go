@@ -1,4 +1,4 @@
-package cb
+package coinbase
 
 import (
 	"context"
@@ -14,24 +14,16 @@ type getAccountResponse struct {
 func (s *AccountService) Get(ctx context.Context, id string) (*Account, error) {
 	url := fmt.Sprintf("%s/api/v3/brokerage/accounts/%s", s.client.baseURL, id)
 
-	req, err := s.client.newRequest(ctx, http.MethodGet, url, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed to generate get account request: %w", err)
-	}
-
-	resp, err := s.client.httpClient.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to fetch account '%s' for the current user: %w", id, err)
-	}
-
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, handleRequestError(resp)
+		return nil, fmt.Errorf("failed to create get account HTTP request: %w", err)
 	}
 
 	var accountResp getAccountResponse
-	err = unmarshal(resp, &accountResp)
+	err = s.client.do(req, http.StatusOK, &accountResp)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch account '%s' for the current user: %w", id, err)
+	}
 
 	return &accountResp.Account, err
 }
