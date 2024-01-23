@@ -22,7 +22,7 @@ type getProductBookResponse struct {
 // GetProductBook gets a list of bids/asks for a single product.
 // The amount of detail shown can be customized with the limit parameter.
 func (s *ProductsService) GetProductBook(ctx context.Context, id string, limit *int) (*PriceBook, error) {
-	url := s.client.baseURL + "api/v3/brokerage/product_book"
+	url := s.client.baseURL + "/api/v3/brokerage/product_book"
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {

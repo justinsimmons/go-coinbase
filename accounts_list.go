@@ -37,7 +37,7 @@ type AccountListOptions struct {
 
 // List retrieves a list of authenticated accounts for the current user.
 // https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getaccounts
-func (s *AccountService) List(ctx context.Context, options *AccountListOptions) ([]Account, error) {
+func (s *AccountService) List(ctx context.Context, options *AccountListOptions) (*ListAccountsResponse, error) {
 	url := s.client.baseURL + "/api/v3/brokerage/accounts"
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
@@ -60,5 +60,5 @@ func (s *AccountService) List(ctx context.Context, options *AccountListOptions) 
 		return nil, fmt.Errorf("failed to fetch list of authenticated accounts for the current user: %w", err)
 	}
 
-	return accountsResp.Accounts, err
+	return &accountsResp, err
 }

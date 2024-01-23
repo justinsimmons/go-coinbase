@@ -60,7 +60,7 @@ type ListOrdersResponse struct {
 //
 //     # Not allowed
 //     /orders/historical/batch?order_status=OPEN,CANCELLED
-func (s *OrdersService) List(ctx context.Context, options ListOrdersOptions) (*ListOrdersResponse, error) {
+func (s *OrdersService) List(ctx context.Context, options *ListOrdersOptions) (*ListOrdersResponse, error) {
 
 	url := s.client.baseURL + "/api/v3/brokerage/orders/historical/batch"
 
@@ -69,12 +69,14 @@ func (s *OrdersService) List(ctx context.Context, options ListOrdersOptions) (*L
 		return nil, fmt.Errorf("failed to generate list orders HTTP request: %w", err)
 	}
 
-	qs, err := query.Values(options)
-	if err != nil {
-		return nil, fmt.Errorf("failed to convert ListOrdersOptions to query string: %w", err)
-	}
+	if options != nil {
+		qs, err := query.Values(options)
+		if err != nil {
+			return nil, fmt.Errorf("failed to convert ListOrdersOptions to query string: %w", err)
+		}
 
-	req.URL.RawQuery = qs.Encode()
+		req.URL.RawQuery = qs.Encode()
+	}
 
 	var orderResp ListOrdersResponse
 	err = s.client.do(req, http.StatusOK, &orderResp)

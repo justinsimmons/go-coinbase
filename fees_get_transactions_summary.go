@@ -45,7 +45,7 @@ type GetTransactionsSummaryResponse struct {
 }
 
 // GetTransactionsSummary gets a summary of transactions with fee tiers, total volume, and fees.
-func (s *FeesService) GetTransactionsSummary(ctx context.Context, options GetTransactionsSummaryOptions) (*GetTransactionsSummaryResponse, error) {
+func (s *FeesService) GetTransactionsSummary(ctx context.Context, options *GetTransactionsSummaryOptions) (*GetTransactionsSummaryResponse, error) {
 	url := s.client.baseURL + "/api/v3/brokerage/transaction_summary"
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
@@ -53,12 +53,14 @@ func (s *FeesService) GetTransactionsSummary(ctx context.Context, options GetTra
 		return nil, fmt.Errorf("failed to create get transactions summary HTTP request: %w", err)
 	}
 
-	qs, err := query.Values(options)
-	if err != nil {
-		return nil, fmt.Errorf("failed to convert GetTransactionsSummaryOptions to query string: %w", err)
-	}
+	if options == nil {
+		qs, err := query.Values(options)
+		if err != nil {
+			return nil, fmt.Errorf("failed to convert GetTransactionsSummaryOptions to query string: %w", err)
+		}
 
-	req.URL.RawQuery = qs.Encode()
+		req.URL.RawQuery = qs.Encode()
+	}
 
 	var summary GetTransactionsSummaryResponse
 	err = s.client.do(req, http.StatusOK, &summary)

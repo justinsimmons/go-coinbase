@@ -20,7 +20,7 @@ type GetBestBidAskResponse struct {
 
 // GetBestBidAsk gets the best bid/ask for all products. A subset of all products can be
 // returned instead by using the product_ids input.
-func (s *ProductsService) GetBest(ctx context.Context, ids ...string) (*GetBestBidAskResponse, error) {
+func (s *ProductsService) GetBestBidAsk(ctx context.Context, ids ...string) (*GetBestBidAskResponse, error) {
 	url := s.client.baseURL + "/api/v3/brokerage/best_bid_ask"
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)

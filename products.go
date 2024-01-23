@@ -28,8 +28,8 @@ type BidAsk struct {
 
 type PriceBook struct {
 	ProductID string     `json:"product_id"`
-	Bids      BidAsk     `json:"bids"`
-	Asks      BidAsk     `json:"asks"`
+	Bids      []BidAsk   `json:"bids"`
+	Asks      []BidAsk   `json:"asks"`
 	Time      *time.Time `json:"time"`
 }
 
