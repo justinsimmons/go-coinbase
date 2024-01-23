@@ -11,6 +11,14 @@ import (
 	"time"
 )
 
+type ContractExpiryType string
+
+const (
+	ContractExpiryTypeUnknown   ContractExpiryType = "UNKNOWN_CONTRACT_EXPIRY_TYPE"
+	ContractExpiryTypeExpiring  ContractExpiryType = "EXPIRING"
+	ContractExpiryTypePerpetual ContractExpiryType = "PERPETUAL"
+)
+
 type ProductsService service
 
 type BidAsk struct {

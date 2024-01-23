@@ -15,14 +15,6 @@ import (
 	"github.com/google/go-querystring/query"
 )
 
-type ContractExpiryType string
-
-const (
-	ContractExpiryTypeUnknown   ContractExpiryType = "UNKNOWN_CONTRACT_EXPIRY_TYPE"
-	ContractExpiryTypeExpiring  ContractExpiryType = "EXPIRING"
-	ContractExpiryTypePerpetual ContractExpiryType = "PERPETUAL"
-)
-
 type ExpiringContractStatus string
 
 const (
