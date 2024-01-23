@@ -3,7 +3,7 @@ Go SDK for Coinbase's Advanced Trade REST API
 
 *This Repo is under active development and should be considered VERY unstable. Please wait until v1.0.0 release to use in any proffessional setting.*
 
-This does not include the [Advanced Trade WebSocket]https://docs.cloud.coinbase.com/advanced-trade-api/docs/ws-overview).
+This does not include the [Advanced Trade WebSocket](https://docs.cloud.coinbase.com/advanced-trade-api/docs/ws-overview).
 
 [API Documentation](https://docs.cloud.coinbase.com/advanced-trade-api/docs/rest-api-overview)
 
@@ -38,11 +38,12 @@ This does not include the [Advanced Trade WebSocket]https://docs.cloud.coinbase.
 | [Schedule Futures Sweep](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_schedulefcmsweep) | Schedule a sweep of funds from your CFTC-regulated futures account to your Coinbase Inc. USD Spot wallet. | X |
 | [List Futures Sweeps](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getfcmsweeps) | Get information on your pending and/or processing requests to sweep funds from your CFTC-regulated futures account to your Coinbase Inc. USD Spot wallet. | X |
 | [Cancel Pending Futures Sweep](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_cancelfcmsweep) | Cancel your pending sweep of funds from your CFTC-regulated futures account to your Coinbase Inc. USD Spot wallet. | X |
-| [Get Transactions Summary](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_gettransactionsummary) | Get a summary of transactions with fee tiers, total volume, and fees. | X |
+| [Get Transactions Summary](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_gettransactionsummary) | Get a summary of transactions with fee tiers, total volume, and fees. | - |
 | []() |  | X |
 | [Create Convert Quote](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_createconvertquote) | Create a convert quote with a specified source currency, target currency, and amount. | X |
 | [Commit Convert Trade](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_commitconverttrade) | Commits a convert trade with a specified trade ID, source currency, and target currency. | X |
 | [Get Convert Trade](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getconverttrade) | Gets a list of information about a convert trade with a specified trade ID, source currency, and target currency. | X |
+| [Get Unix Time](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getunixtime) | Get the current time from the Coinbase Advanced API. | - |
 
 ## Order Management
 
@@ -59,3 +60,7 @@ Advanced Trade API endpoints are throttled by user at 30 requests per second.
 Coinbase Pro has been disabled for use and all customers have been migrated as of December 1, 2023. This was accelerated from a prior announcement of Pro deprecation in 2024.
 
 You cannot use existing Pro API keys to trade with Advanced Trade. See [Migrating from Pro](https://docs.cloud.coinbase.com/advanced-trade-api/docs/migration).
+
+## License
+
+This program is released under the GNU Affero General Public License v3 or later.
