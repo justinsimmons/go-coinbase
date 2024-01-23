@@ -42,7 +42,7 @@ type ListOrdersOptions struct {
 
 type ListOrdersResponse struct {
 	Orders   []Order `json:"orders"`   // A list of orders matching the query.
-	Sequence *int64  `json:"sequence"` // The sequence of the db at which this state was read.
+	Sequence *string `json:"sequence"` // The sequence of the db at which this state was read.
 	HasNext  bool    `json:"has_next"` // Whether there are additional pages for this query.
 	Cursor   *string `json:"cursor"`   // Cursor for paginating. Users can use this string to pass in the next call to this endpoint, and repeat this process to fetch all fills through pagination.
 }
@@ -61,7 +61,6 @@ type ListOrdersResponse struct {
 //     # Not allowed
 //     /orders/historical/batch?order_status=OPEN,CANCELLED
 func (s *OrdersService) List(ctx context.Context, options *ListOrdersOptions) (*ListOrdersResponse, error) {
-
 	url := s.client.baseURL + "/api/v3/brokerage/orders/historical/batch"
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)

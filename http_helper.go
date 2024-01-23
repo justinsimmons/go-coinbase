@@ -8,11 +8,14 @@
 package coinbase
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
+
+	"github.com/google/go-querystring/query"
 )
 
 // ErrUnexpectedAPIResponse - coinbase API returned a response outside the API documetation.
@@ -72,6 +75,29 @@ func (c *Client) do(r *http.Request, successCode int, v any) error {
 	err = json.Unmarshal(buf, v)
 	if err != nil {
 		return fmt.Errorf("failed to unmarshal HTTP response '%s' into '%T': %w", buf, v, err)
+	}
+
+	return nil
+}
+
+func (c *Client) get(ctx context.Context, url string, params any, v any) error {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return fmt.Errorf("failed to create HTTP request: %w", err)
+	}
+
+	if params != nil {
+		qs, err := query.Values(params)
+		if err != nil {
+			return fmt.Errorf("failed to convert query params to string: %w", err)
+		}
+
+		req.URL.RawQuery = qs.Encode()
+	}
+
+	err = c.do(req, http.StatusOK, v)
+	if err != nil {
+		return fmt.Errorf("failed to fetch orders: %w", err)
 	}
 
 	return nil

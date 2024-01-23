@@ -21,12 +21,12 @@ type Client struct {
 	baseURL    string       // Base URL of the Advanced Trade REST API.
 	httpClient *http.Client // Client used to make HTTP calls.
 
-	Accounts *AccountService  // Interface with the Advanced Trade REST API Accounts APIs.
-	Orders   *OrdersService   // Interface with the Advanced Trade REST API Orders APIs.
-	Products *ProductsService // Interface with the Advanced Trade REST API Products API.
-	Fees     *FeesService     // Interface with the Advanced Trade REST API Fees API.
-
-	Common *CommonService // Interface with the Advanced Trade REST API Common API.
+	Accounts  *AccountService    // Interface with the Advanced Trade REST API Accounts APIs.
+	Orders    *OrdersService     // Interface with the Advanced Trade REST API Orders APIs.
+	Products  *ProductsService   // Interface with the Advanced Trade REST API Products API.
+	Fees      *FeesService       // Interface with the Advanced Trade REST API Fees API.
+	Portfolio *PortfoliosService // Interface with the Advanced Trade REST API Portfolios API.
+	Common    *CommonService     // Interface with the Advanced Trade REST API Common API.
 }
 
 type service struct {
@@ -76,6 +76,7 @@ func New(apiKey string, apiSecret string, opts ...option) *Client {
 	c.Orders = (*OrdersService)(&commonService)
 	c.Products = (*ProductsService)(&commonService)
 	c.Fees = (*FeesService)(&commonService)
+	c.Portfolio = (*PortfoliosService)(&commonService)
 	c.Common = (*CommonService)(&commonService)
 
 	for _, opt := range opts {
