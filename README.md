@@ -1,11 +1,58 @@
 # go-coinbase
-Go SDK for Coinbase's Advanced Trade REST API 
-
-*This Repo is under active development and should be considered VERY unstable. Please wait until v1.0.0 release to use in any proffessional setting.*
+Go SDK for Coinbase's v3 [Advanced Trade REST API](https://docs.cloud.coinbase.com/advanced-trade-api/docs/rest-api-overview)
 
 This does not include the [Advanced Trade WebSocket](https://docs.cloud.coinbase.com/advanced-trade-api/docs/ws-overview).
 
-[API Documentation](https://docs.cloud.coinbase.com/advanced-trade-api/docs/rest-api-overview)
+## Installation
+
+go-coinbase is compatible with Go releases in module mode:
+
+```bash
+go get github.com/justinsimmons/go-coinbase
+```
+
+## Usage
+
+```go
+    import "github.com/justinsimmons/go-coinbase"
+```
+
+Alternatively you can use an alias to shorten the invocation.
+
+```go
+    import cb "github.com/justinsimmons/go-coinbase"
+```
+
+Construct a new Coinbase client, then use the various services on the client to
+access different parts of the Advanced Trade REST API. For example:
+
+```go
+client := coinbase.New("api-key", "api-secret")
+
+// List all accounts for the user.
+accounts, err := client.Accounts.List(context.Background(), nil)
+```
+Some APIs have optional parameters that  can be passed:
+
+```go
+client := coinbase.New("api-key", "api-secret")
+
+// Will filter the orders response to only return a specific product.
+opt := &ListOrdersOptions{ProductID: coinbase.String("BTC-USD")}
+
+// Gets a list of orders that can be filterd with filtered by optional parameters.
+orders, err := client.Orders.List(context.Background(), opt)
+```
+The services of a client divide the API into logical chunks and correspond to the structure of the Advanced Trade REST API documentation at: https://docs.cloud.coinbase.com/advanced-trade-api/docs/welcome .
+
+NOTE: Using the [context](https://godoc.org/context) package, one can easily pass cancelation signals and deadlines to various services of the client for handling a request. In case there is no context available, then `context.Background()` can be used as a starting point.
+
+## Rate Limits
+
+Advanced Trade API endpoints are throttled by user at 30 requests per second.
+
+Learn more about Coinbase rate limiting at https://docs.cloud.coinbase.com/advanced-trade-api/docs/rest-api-rate-limits .
+
 
 # Supported
 
@@ -13,14 +60,14 @@ This does not include the [Advanced Trade WebSocket](https://docs.cloud.coinbase
 | --- | ----------- | --------- |
 | [List Accounts](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getaccounts) | Get a list of authenticated accounts for the current user. | ✅ |
 | [Get Account](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getaccount) |Get a list of information about an account, given an account UUID. | ✅ |
-| [Create Order](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_postorder) | Create an order with a specified product_id (asset-pair), side (buy/sell), etc. | ✅ |
-| [Cancel Orders](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_cancelorders) | Initiate cancel requests for one or more orders. | ✅ |
-| [Edit Order](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_editorder) | Edit an order with a specified new `size`, or new `price`. | ✅ |
-| [Edit Order Preview](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_previeweditorder) | Simulate an edit order request with a specified new size, or new price, to preview the result of an edit. Only limit order types, with time in force type of good-till-cancelled can be edited. | ✅ |
-| [List Orders](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_gethistoricalorders) | Get a list of orders filtered by optional query parameters (`product_id`, `order_status`, etc). | ✅ |
-| [List Fills](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getfills) | Get a list of fills filtered by optional query parameters (`product_id`, `order_id`, etc). | ✅ |
-| [Get Order](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_gethistoricalorder) | Get a single order by order ID. | ✅ |
-| [Get Best Bid/Ask](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getbestbidask) | Get the best bid/ask for all products. A subset of all products can be returned instead by using the product_ids input. | ✅ |
+| [Create Order](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_postorder) | Create an order with a specified product_id (asset-pair), side (buy/sell), etc. | ❌ |
+| [Cancel Orders](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_cancelorders) | Initiate cancel requests for one or more orders. | ❌ |
+| [Edit Order](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_editorder) | Edit an order with a specified new `size`, or new `price`. | ❌ |
+| [Edit Order Preview](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_previeweditorder) | Simulate an edit order request with a specified new size, or new price, to preview the result of an edit. Only limit order types, with time in force type of good-till-cancelled can be edited. | ❌ |
+| [List Orders](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_gethistoricalorders) | Get a list of orders filtered by optional query parameters (`product_id`, `order_status`, etc). | ❌ |
+| [List Fills](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getfills) | Get a list of fills filtered by optional query parameters (`product_id`, `order_id`, etc). | ❌ |
+| [Get Order](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_gethistoricalorder) | Get a single order by order ID. | ❌ |
+| [Get Best Bid/Ask](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getbestbidask) | Get the best bid/ask for all products. A subset of all products can be returned instead by using the product_ids input. |  ✅ |
 | [Get Product Book](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getbestbidask) | Get a list of bids/asks for a single product. The amount of detail shown can be customized with the limit parameter. | ✅ |
 | [List Products](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getproducts) | Get a list of the available currency pairs for trading. | ✅ |
 | [Get Product](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getproduct) | Get information on a single product by product ID. | ✅ |
@@ -50,10 +97,6 @@ The maximum number of `OPEN` orders allowed per `product_id` is 500. If you have
 
 [Advanced API Order Management](https://docs.cloud.coinbase.com/advanced-trade-api/docs/rest-api-orders)
 
-## Rate Limits
-
-Advanced Trade API endpoints are throttled by user at 30 requests per second.
-
 ## Coinbase Pro
 
 Coinbase Pro has been disabled for use and all customers have been migrated as of December 1, 2023. This was accelerated from a prior announcement of Pro deprecation in 2024.
@@ -62,4 +105,6 @@ You cannot use existing Pro API keys to trade with Advanced Trade. See [Migratin
 
 ## License
 
-This program is released under the GNU Affero General Public License v3 or later.
+Copyright 2024 Justin Simmons.
+
+This program is released under the [GNU Affero General Public License v3](./LICENSE) or later.
