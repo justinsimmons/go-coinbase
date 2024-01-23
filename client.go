@@ -25,6 +25,8 @@ type Client struct {
 	Orders   *OrdersService   // Interface with the Advanced Trade REST API Orders APIs.
 	Products *ProductsService // Interface with the Advanced Trade REST API Products API.
 	Fees     *FeesService     // Interface with the Advanced Trade REST API Fees API.
+
+	Common *CommonService // Interface with the Advanced Trade REST API Common API.
 }
 
 type service struct {
@@ -74,6 +76,7 @@ func New(apiKey string, apiSecret string, opts ...option) *Client {
 	c.Orders = (*OrdersService)(&commonService)
 	c.Products = (*ProductsService)(&commonService)
 	c.Fees = (*FeesService)(&commonService)
+	c.Common = (*CommonService)(&commonService)
 
 	for _, opt := range opts {
 		if opt != nil {
