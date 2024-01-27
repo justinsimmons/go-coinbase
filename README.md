@@ -60,13 +60,13 @@ Learn more about Coinbase rate limiting at https://docs.cloud.coinbase.com/advan
 | --- | ----------- | --------- |
 | [List Accounts](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getaccounts) | Get a list of authenticated accounts for the current user. | ✅ |
 | [Get Account](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getaccount) |Get a list of information about an account, given an account UUID. | ✅ |
-| [Create Order](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_postorder) | Create an order with a specified product_id (asset-pair), side (buy/sell), etc. | ❌ |
-| [Cancel Orders](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_cancelorders) | Initiate cancel requests for one or more orders. | ❌ |
-| [Edit Order](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_editorder) | Edit an order with a specified new `size`, or new `price`. | ❌ |
-| [Edit Order Preview](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_previeweditorder) | Simulate an edit order request with a specified new size, or new price, to preview the result of an edit. Only limit order types, with time in force type of good-till-cancelled can be edited. | ❌ |
-| [List Orders](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_gethistoricalorders) | Get a list of orders filtered by optional query parameters (`product_id`, `order_status`, etc). | ❌ |
-| [List Fills](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getfills) | Get a list of fills filtered by optional query parameters (`product_id`, `order_id`, etc). | ❌ |
-| [Get Order](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_gethistoricalorder) | Get a single order by order ID. | ❌ |
+| [Create Order](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_postorder) | Create an order with a specified product_id (asset-pair), side (buy/sell), etc. | ⚠️ |
+| [Cancel Orders](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_cancelorders) | Initiate cancel requests for one or more orders. | ⚠️ |
+| [Edit Order](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_editorder) | Edit an order with a specified new `size`, or new `price`. | ⚠️ |
+| [Edit Order Preview](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_previeweditorder) | Simulate an edit order request with a specified new size, or new price, to preview the result of an edit. Only limit order types, with time in force type of good-till-cancelled can be edited. | ⚠️ |
+| [List Orders](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_gethistoricalorders) | Get a list of orders filtered by optional query parameters (`product_id`, `order_status`, etc). | ⚠️ |
+| [List Fills](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getfills) | Get a list of fills filtered by optional query parameters (`product_id`, `order_id`, etc). | ⚠️ |
+| [Get Order](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_gethistoricalorder) | Get a single order by order ID. | ⚠️ |
 | [Get Best Bid/Ask](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getbestbidask) | Get the best bid/ask for all products. A subset of all products can be returned instead by using the product_ids input. |  ✅ |
 | [Get Product Book](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getbestbidask) | Get a list of bids/asks for a single product. The amount of detail shown can be customized with the limit parameter. | ✅ |
 | [List Products](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getproducts) | Get a list of the available currency pairs for trading. | ✅ |
@@ -90,6 +90,10 @@ Learn more about Coinbase rate limiting at https://docs.cloud.coinbase.com/advan
 | [Commit Convert Trade](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_commitconverttrade) | Commits a convert trade with a specified trade ID, source currency, and target currency. | ❌ |
 | [Get Convert Trade](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getconverttrade) | Gets a list of information about a convert trade with a specified trade ID, source currency, and target currency. | ❌ |
 | [Get Unix Time](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getunixtime) | Get the current time from the Coinbase Advanced API. | ✅ |
+
+✅ = Implemented and fully tested.
+⚠️ = Implemented but not able to test.
+❌ = Not implemented but on roadmap.
 
 ## Order Management
 
