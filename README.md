@@ -27,15 +27,16 @@ Construct a new Coinbase client, then use the various services on the client to
 access different parts of the Advanced Trade REST API. For example:
 
 ```go
-client := coinbase.New("api-key", "api-secret")
+client := coinbase.NewWithCloud("api-key", "api-secret")
 
 // List all accounts for the user.
 accounts, err := client.Accounts.List(context.Background(), nil)
 ```
+
 Some APIs have optional parameters that  can be passed:
 
 ```go
-client := coinbase.New("api-key", "api-secret")
+client := coinbase.NewWithCloud("api-key", "api-secret")
 
 // Will filter the orders response to only return a specific product.
 opt := &ListOrdersOptions{ProductID: coinbase.String("BTC-USD")}
@@ -47,14 +48,7 @@ The services of a client divide the API into logical chunks and correspond to th
 
 NOTE: Using the [context](https://godoc.org/context) package, one can easily pass cancelation signals and deadlines to various services of the client for handling a request. In case there is no context available, then `context.Background()` can be used as a starting point.
 
-## Rate Limits
-
-Advanced Trade API endpoints are throttled by user at 30 requests per second.
-
-Learn more about Coinbase rate limiting at https://docs.cloud.coinbase.com/advanced-trade-api/docs/rest-api-rate-limits .
-
-
-# Supported
+# Supported APIs
 
 | API | Description | Supported |
 | --- | ----------- | --------- |
@@ -94,6 +88,92 @@ Learn more about Coinbase rate limiting at https://docs.cloud.coinbase.com/advan
 ✅ = Implemented and fully tested.
 ⚠️ = Implemented but not able to test.
 ❌ = Not implemented but on roadmap.
+
+## Authentication
+
+Coinbase has multiple authentication schemes available for different APIs. For information on which scheme you should use please consult the [docs](https://docs.cloud.coinbase.com/advanced-trade-api/docs/auth#authentication-schemes).
+
+I would recommend you use [cloud API trading keys](#cloud-api-trading-keys) as they allow for the full functionality of the advance trade APIs.
+
+The following is the compatibility list for the available authentication schemes with `go-coinbase`.
+
+| Scheme | Supported |
+| ------ | --------- |
+| [Cloud API Trading keys](#cloud-api-trading-keys) | ✅ |
+| [OAuth](#oauth) | ⚠️ |
+| [Legacy API Keys](#legacy-api-keys) | ✅ |
+
+### Cloud API Trading Keys
+
+Coinbase Cloud supports two API key types, "Trading" keys and "General" keys. **The Advanced API is only compatible with Cloud API Trading keys.**
+
+[Instructions](https://docs.cloud.coinbase.com/advanced-trade-api/docs/auth#creating-trading-keys) on generating a cloud API trading key.
+
+Generate a client with Cloud API Trading credentials:
+```go
+// Please don't actually hard code these, pass them in via flag.
+const (
+    apiKey = "organizations/{org_id}/apiKeys/{key_id}"
+    apiSecret = "-----BEGIN EC PRIVATE KEY-----\nYOUR PRIVATE KEY\n-----END EC PRIVATE KEY-----\n"
+)
+
+// All API requests will use cloud API trading credentials.
+client := coinbase.NewWithCloud(apiKey, apiSecret)
+```
+
+### Legacy API Keys
+
+Note that the legacy api keys do not suport any of the newer functionality of the Advanced Trade API (Portfolios, etc.).
+
+[Instructions](https://docs.cloud.coinbase.com/advanced-trade-api/docs/auth#creating-legacy-keys) on generating a legacy api key.
+
+Generate a client with legacy credentials:
+```go
+// All API requests will use legacy API credentials.
+client := coinbase.NewWithLegacy("api-key", "api-secret")
+```
+
+### OAuth
+
+The OAuth authentication scheme is for applications serving many users, which is outside my use case for this package. To use this authentication scheme you are going to need to [implement a custom authentication scheme](#cusom-authentication-scheme).
+
+### Custom Authentication Scheme
+
+If for whatever reason you would like to use your own authentication method for the API requests you need not rely on the prebuilt functionality provided by this client. You may implem
+
+
+1. Implement the `coinbase.Authenticator` interface. Example:
+    ```go
+    type customAuthenticator struct {
+        token string
+    }
+
+    // customAuthenticator implements coinbase.Authenticator interface.
+    func (a customAuthenticator) Authenticate(r *http.Request) error {
+        r.Header.Set("Authorization", "Bearer " + a.token)
+
+        return nil
+    }
+    ```
+
+1. Inject it into the client with the option `coinbase.WithCustomAuthenticator()`.
+    ```go
+    token := "foo"
+    authenticator := customAuthenticator{token: token}
+
+    // Inject custom authenticator into the client.
+    client := client.New(coinbase.WithCustomAuthenticator(authenticator))
+
+    // Headers will now have a {"Authentication": {"Bearer foo"}} entry.
+    orders, err := client.Orders.List(context.Background(), opt)
+    ```
+
+## Rate Limits
+
+Advanced Trade API endpoints are throttled by user at 30 requests per second.
+
+Learn more about Coinbase rate limiting at https://docs.cloud.coinbase.com/advanced-trade-api/docs/rest-api-rate-limits .
+
 
 ## Order Management
 

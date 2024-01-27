@@ -51,8 +51,8 @@ func handleRequestError(resp *http.Response) error {
 }
 
 func (c *Client) do(r *http.Request, successCode int, v any) error {
-	// Add reurired authentication to request.
-	c.authenticate(r)
+	// Add required authentication to request.
+	c.authenticator.Authenticate(r)
 
 	r.Header.Add("Accept", "application/json")
 

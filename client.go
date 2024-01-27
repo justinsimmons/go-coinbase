@@ -7,16 +7,24 @@
 
 package coinbase
 
-import "net/http"
+import (
+	"fmt"
+	"net/http"
+	"time"
+)
 
 const (
 	productionURI = "https://api.coinbase.com"
 )
 
+// Authenticator adds authentication details to each HTTP request made from the client.
+type Authenticator interface {
+	Authenticate(*http.Request) error
+}
+
 // Coinbase Advanced Trade REST API client.
 type Client struct {
-	apiKey    string // The API key used to authenticate requests (that you create on coinbase.com).
-	apiSecret string // The API secret used to authenticate requests (that you create on coinbase.com).
+	authenticator Authenticator // Handles authentication for the Advanced Trade REST API.
 
 	baseURL    string       // Base URL of the Advanced Trade REST API.
 	httpClient *http.Client // Client used to make HTTP calls.
@@ -59,12 +67,22 @@ func WithHTTPClient(httpClient *http.Client) func(*Client) {
 	}
 }
 
-// New creates a new Coinbase Advanced Trade REST API client.
-func New(apiKey string, apiSecret string, opts ...option) *Client {
-	c := Client{
-		apiKey:    apiKey,
-		apiSecret: apiSecret,
+// WithCustomAuthenticator allows the caller to provide custom authentication schema to the client.
+// This is useful to hook into the HTTP request and modify it as desired before it is executed.
+func WithCustomAuthenticator(authenticator Authenticator) func(*Client) {
+	return func(c *Client) {
+		c.authenticator = authenticator
+	}
+}
 
+// New creates a new Coinbase Advanced Trade REST API client.
+// By default no authentication schema has been added. Coinbase will block any unauthenticated
+// requests.
+//   - To use Legacy API key authentication prefer NewWithLegacy()
+//   - To use Cloud API Trading Key authentication prefer NewWithCloud()
+//   - To use a custom authentication schema use the WithCustomAuthenticator option as an argument to this method.
+func New(opts ...option) *Client {
+	c := Client{
 		baseURL:    productionURI,
 		httpClient: http.DefaultClient,
 	}
@@ -88,6 +106,37 @@ func New(apiKey string, apiSecret string, opts ...option) *Client {
 	return &c
 }
 
+// New creates a new Coinbase Advanced Trade REST API client, using legacy API key authentication.
+// Please note some of he newer endpoints will not work unless you use the new Cloud API Trading Keys.
+func NewWithLegacy(apiKey string, apiSecret string, opts ...option) *Client {
+	c := New(opts...)
+
+	c.authenticator = legacyAuthenticator{
+		apiKey:    apiKey,
+		apiSecret: apiSecret,
+	}
+
+	return c
+}
+
+// New creates a new Coinbase Advanced Trade REST API client, using Cloud API Trading Keys
+// for authentication.
+func NewWithCloud(apiKey string, apiSecret string, opts ...option) (*Client, error) {
+	c := New(opts...)
+
+	key, err := parsePrivateKey(apiSecret)
+	if err != nil {
+		return nil, fmt.Errorf("invalid api secret provided: %w", err)
+	}
+
+	c.authenticator = cloudAuthenticator{
+		apiKey:     apiKey,
+		signingKey: key,
+	}
+
+	return c, err
+}
+
 // Bool is a helper function that allocates a new bool value
 // to store v and returns a pointer to it.
 func Bool(v bool) *bool {
@@ -109,5 +158,11 @@ func Int64(v int64) *int64 {
 // String is a helper function that allocates a new string value
 // to store v and returns a pointer to it.
 func String(v string) *string {
+	return &v
+}
+
+// Time is a helper function that allocates a new time value
+// to store v and returns a pointer to it.
+func Time(v time.Time) *time.Time {
 	return &v
 }
