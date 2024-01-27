@@ -97,7 +97,22 @@ func (c *Client) get(ctx context.Context, url string, params any, v any) error {
 
 	err = c.do(req, http.StatusOK, v)
 	if err != nil {
-		return fmt.Errorf("failed to fetch orders: %w", err)
+		return err
+	}
+
+	return nil
+}
+
+func (c *Client) post(ctx context.Context, url string, body io.Reader, v any) error {
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, body)
+	if err != nil {
+		return fmt.Errorf("failed to create HTTP request: %w", err)
+	}
+
+	err = c.do(req, http.StatusOK, v)
+	if err != nil {
+		return err
 	}
 
 	return nil

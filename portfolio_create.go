@@ -12,7 +12,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"net/http"
 )
 
 type createPortfolioRequest struct {
@@ -23,26 +22,19 @@ type createPortfolioResponse struct {
 	Portfolio *Portfolio `json:"portfolio"`
 }
 
-// Create a portfolio.
+// Create creates a portfolio.
 func (s *PortfoliosService) Create(ctx context.Context, name string) (*Portfolio, error) {
 	b, err := json.Marshal(createPortfolioRequest{Name: name})
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal create portfolio request body to JSON: %w", err)
 	}
 
-	url := s.client.baseURL + "/api/v3/brokerage/portfolios"
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewBuffer(b))
-	if err != nil {
-		return nil, fmt.Errorf("failed to create HTTP request: %w", err)
-	}
-
 	var portfolioResp createPortfolioResponse
-	err = s.client.do(req, http.StatusOK, &portfolioResp)
+
+	err = s.client.post(ctx, s.client.baseURL+"/api/v3/brokerage/portfolios", bytes.NewBuffer(b), &portfolioResp)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create portfolio: %w", err)
 	}
 
 	return portfolioResp.Portfolio, nil
-
 }

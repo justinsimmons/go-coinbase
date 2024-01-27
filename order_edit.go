@@ -12,7 +12,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"net/http"
 )
 
 type EditFailureReason string
@@ -52,13 +51,8 @@ func (s *OrdersService) edit(ctx context.Context, url string, options EditOrderO
 		return nil, fmt.Errorf("failed to marshal edit order options to JSON: %w", err)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewBuffer(b))
-	if err != nil {
-		return nil, fmt.Errorf("failed to generate edit order HTTP request: %w", err)
-	}
-
 	var orderResp EditOrderResponse
-	err = s.client.do(req, http.StatusOK, &orderResp)
+	err = s.client.post(ctx, url, bytes.NewBuffer(b), &orderResp)
 	if err != nil {
 		err = fmt.Errorf("failed to edit order: %w", err)
 	}

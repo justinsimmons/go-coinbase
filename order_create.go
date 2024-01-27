@@ -12,7 +12,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"net/http"
 )
 
 type MarginType string
@@ -78,21 +77,14 @@ type CreateOrderResponse struct {
 	OrderConfiguration *OrderConfiguration        `json:"order_configuration"`
 }
 
-func (s *OrdersService) Create(ctx context.Context, order CreateOrderOptions) (any, error) {
-	b, err := json.Marshal(&order)
+func (s *OrdersService) Create(ctx context.Context, options CreateOrderOptions) (any, error) {
+	b, err := json.Marshal(&options)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal OrderRequest to JSON: %w", err)
 	}
 
-	url := s.client.baseURL + "/api/v3/brokerage/orders"
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewBuffer(b))
-	if err != nil {
-		return nil, fmt.Errorf("failed to generate create order HTTP request: %w", err)
-	}
-
 	var orderResp CreateOrderResponse
-	err = s.client.do(req, http.StatusOK, &orderResp)
+	err = s.client.post(ctx, s.client.baseURL+"/api/v3/brokerage/orders", bytes.NewBuffer(b), &orderResp)
 	if err != nil {
 		err = fmt.Errorf("failed to create order: %w", err)
 	}
