@@ -34,6 +34,7 @@ type Client struct {
 	Products  *ProductsService   // Interface with the Advanced Trade REST API Products API.
 	Fees      *FeesService       // Interface with the Advanced Trade REST API Fees API.
 	Portfolio *PortfoliosService // Interface with the Advanced Trade REST API Portfolios API.
+	Futures   *FuturesService    // Interface with the Advanced Trade REST API Futures API.
 	Common    *CommonService     // Interface with the Advanced Trade REST API Common API.
 }
 
@@ -95,6 +96,7 @@ func New(opts ...option) *Client {
 	c.Products = (*ProductsService)(&commonService)
 	c.Fees = (*FeesService)(&commonService)
 	c.Portfolio = (*PortfoliosService)(&commonService)
+	c.Futures = (*FuturesService)(&commonService)
 	c.Common = (*CommonService)(&commonService)
 
 	for _, opt := range opts {

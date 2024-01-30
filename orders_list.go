@@ -10,10 +10,7 @@ package coinbase
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"time"
-
-	"github.com/google/go-querystring/query"
 )
 
 type OrderSide string

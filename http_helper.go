@@ -117,3 +117,37 @@ func (c *Client) post(ctx context.Context, url string, body io.Reader, v any) er
 
 	return nil
 }
+
+func (c *Client) put(ctx context.Context, url string, body io.Reader, v any) error {
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPut, url, body)
+	if err != nil {
+		return fmt.Errorf("failed to create HTTP request: %w", err)
+	}
+
+	err = c.do(req, http.StatusOK, v)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *Client) delete(ctx context.Context, url string) error {
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, url, nil)
+	if err != nil {
+		return fmt.Errorf("failed to create HTTP request: %w", err)
+	}
+
+	// Typically HTTP DELETE requests do not return a response body.
+	// If it does we can catch it in here and then reevaluate.
+	v := map[string]any{}
+
+	err = c.do(req, http.StatusOK, &v)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

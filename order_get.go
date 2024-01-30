@@ -10,7 +10,6 @@ package coinbase
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"time"
 )
 
