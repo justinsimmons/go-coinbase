@@ -12,22 +12,19 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+
+	"github.com/google/uuid"
 )
 
-type Funds struct {
-	Value    string `json:"value"`    // These two values fully represent the monetary amount. Non-localized amount in decimal notation (e.g. "1.234").
-	Currency string `json:"currency"` // Currency symbol (USD, BTC, etc). Not an asset UUID.
-}
-
 type PortfolioMoveFundsOptions struct {
-	Funds             Funds  `json:"funds"`                 // Represents a monetary amount.
-	SourcePortfolioID string `json:"source_portfolio_uuid"` // UUID of the portfolio to transfer funds from.
-	TargetPortfolioID string `json:"target_portfolio_uuid"` // UUID of the portfolio to transfer funds to.
+	Funds               Funds     `json:"funds"`                 // Represents a monetary amount.
+	SourcePortfolioUUID uuid.UUID `json:"source_portfolio_uuid"` // UUID of the portfolio to transfer funds from.
+	TargetPortfolioUUID uuid.UUID `json:"target_portfolio_uuid"` // UUID of the portfolio to transfer funds to.
 }
 
 type PorfoliosMoveFundsResponse struct {
-	SourcePortfolioID *string `json:"source_portfolio_uuid"` // UUID of the portfolio the funds were transfered from.
-	TargetPortfolioID *string `json:"target_portfolio_uuid"` // UUID of the portfolio the funds were transfered to.
+	SourcePortfolioUUID *uuid.UUID `json:"source_portfolio_uuid"` // UUID of the portfolio the funds were transfered from.
+	TargetPortfolioUUID *uuid.UUID `json:"target_portfolio_uuid"` // UUID of the portfolio the funds were transfered to.
 }
 
 // MoveFunds transfers funds between portfolios.

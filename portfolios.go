@@ -7,6 +7,8 @@
 
 package coinbase
 
+import "github.com/google/uuid"
+
 type PortfoliosService service
 
 type PortfolioType string
@@ -18,9 +20,22 @@ const (
 	PortfolioTypeINTX      PortfolioType = "INTX"
 )
 
+type FuturesPositionSide string
+
+const (
+	FuturesPositionSideUnspecified FuturesPositionSide = "FUTURES_POSITION_SIDE_UNSPECIFIED"
+	FuturesPositionSideLong        FuturesPositionSide = "FUTURES_POSITION_SIDE_LONG"
+	FuturesPositionSideShort       FuturesPositionSide = "FUTURES_POSITION_SIDE_SHORT"
+)
+
 type Portfolio struct {
 	Name    *string        `json:"name"`
-	UUID    *string        `json:"uuid"`
+	UUID    *uuid.UUID     `json:"uuid"`
 	Type    *PortfolioType `json:"type"`
 	Deleted *bool          `json:"deleted"`
+}
+
+type Funds struct {
+	Value    string `json:"value"`    // These two values fully represent the monetary amount. Non-localized amount in decimal notation (e.g. "1.234").
+	Currency string `json:"currency"` // Currency symbol (USD, BTC, etc). Not an asset UUID.
 }
