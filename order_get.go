@@ -107,16 +107,11 @@ type getOrderResponse struct {
 	Order Order `json:"order"`
 }
 
+// Get retrieves a single order by order ID.
 func (s *OrdersService) Get(ctx context.Context, id string) (*Order, error) {
-	url := fmt.Sprintf("%s/api/v3/brokerage/orders/historical/%s", s.client.baseURL, id)
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to generate get account HTTP request: %w", err)
-	}
-
 	var orderResp getOrderResponse
-	err = s.client.do(req, http.StatusOK, &orderResp)
+
+	err := s.client.get(ctx, fmt.Sprintf("%s/api/v3/brokerage/orders/historical/%s", s.client.baseURL, id), nil, &orderResp)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch order '%s' for the current user: %w", id, err)
 	}

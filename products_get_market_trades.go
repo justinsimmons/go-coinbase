@@ -10,10 +10,7 @@ package coinbase
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"time"
-
-	"github.com/google/go-querystring/query"
 )
 
 type GetMarketTradeOptions struct {
@@ -42,22 +39,9 @@ type GetMarketTradesResponse struct {
 
 // Get snapshot information, by product ID, about the last trades (ticks), best bid/ask, and 24h volume.
 func (s *ProductsService) GetMarketTrades(ctx context.Context, options GetMarketTradeOptions) (*GetMarketTradesResponse, error) {
-	url := fmt.Sprintf("%s/api/v3/brokerage/products/%s/ticker", s.client.baseURL, options.ProductID)
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create get market trades HTTP request: %w", err)
-	}
-
-	qs, err := query.Values(options)
-	if err != nil {
-		return nil, fmt.Errorf("failed to convert GetMarketTradeOptions to query string: %w", err)
-	}
-
-	req.URL.RawQuery = qs.Encode()
-
 	var trades GetMarketTradesResponse
-	err = s.client.do(req, http.StatusOK, &trades)
+
+	err := s.client.get(ctx, fmt.Sprintf("%s/api/v3/brokerage/products/%s/ticker", s.client.baseURL, options.ProductID), &options, &trades)
 	if err != nil {
 		err = fmt.Errorf("failed to fetch get market trades for product '%s': %w", options.ProductID, err)
 	}

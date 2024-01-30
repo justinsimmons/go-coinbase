@@ -10,10 +10,7 @@ package coinbase
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"time"
-
-	"github.com/google/go-querystring/query"
 )
 
 type TimeGranularity string
@@ -56,22 +53,9 @@ type getProductCandlesResponse struct {
 // end: Timestamp for ending range of aggregations.
 // granularity: The time slice value for each candle.
 func (s *ProductsService) GetProductCandles(ctx context.Context, options GetProductCandlesOptions) ([]Candles, error) {
-	url := fmt.Sprintf("%s/api/v3/brokerage/products/%s/candles", s.client.baseURL, options.ProductID)
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create get product candles HTTP request: %w", err)
-	}
-
-	qs, err := query.Values(options)
-	if err != nil {
-		return nil, fmt.Errorf("failed to convert GetProductCandlesOptions to query string: %w", err)
-	}
-
-	req.URL.RawQuery = qs.Encode()
-
 	var candlesResp getProductCandlesResponse
-	err = s.client.do(req, http.StatusOK, &candlesResp)
+
+	err := s.client.get(ctx, fmt.Sprintf("%s/api/v3/brokerage/products/%s/candles", s.client.baseURL, options.ProductID), &options, &candlesResp)
 	if err != nil {
 		err = fmt.Errorf("failed to fetch get product candles for product '%s': %w", options.ProductID, err)
 	}

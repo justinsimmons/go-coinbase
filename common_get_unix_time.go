@@ -10,7 +10,6 @@ package coinbase
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"strconv"
 	"time"
 )
@@ -37,15 +36,9 @@ func (ut CoinbaseUnixTime) UnixMilli() (time.Time, error) {
 
 // GetUnixTime gets the current time from the Coinbase Advanced API.
 func (s *CommonService) GetUnixTime(ctx context.Context) (*CoinbaseUnixTime, error) {
-	url := s.client.baseURL + "/api/v3/brokerage/time"
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create get unix time HTTP request: %w", err)
-	}
-
 	var t CoinbaseUnixTime
-	err = s.client.do(req, http.StatusOK, &t)
+
+	err := s.client.get(ctx, s.client.baseURL+"/api/v3/brokerage/time", nil, &t)
 	if err != nil {
 		err = fmt.Errorf("failed to get unix time: %w", err)
 	}

@@ -10,9 +10,6 @@ package coinbase
 import (
 	"context"
 	"fmt"
-	"net/http"
-
-	"github.com/google/go-querystring/query"
 )
 
 type GetTransactionsSummaryOptions struct {
@@ -46,24 +43,9 @@ type GetTransactionsSummaryResponse struct {
 
 // GetTransactionsSummary gets a summary of transactions with fee tiers, total volume, and fees.
 func (s *FeesService) GetTransactionsSummary(ctx context.Context, options *GetTransactionsSummaryOptions) (*GetTransactionsSummaryResponse, error) {
-	url := s.client.baseURL + "/api/v3/brokerage/transaction_summary"
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create get transactions summary HTTP request: %w", err)
-	}
-
-	if options == nil {
-		qs, err := query.Values(options)
-		if err != nil {
-			return nil, fmt.Errorf("failed to convert GetTransactionsSummaryOptions to query string: %w", err)
-		}
-
-		req.URL.RawQuery = qs.Encode()
-	}
-
 	var summary GetTransactionsSummaryResponse
-	err = s.client.do(req, http.StatusOK, &summary)
+
+	err := s.client.get(ctx, s.client.baseURL+"/api/v3/brokerage/transaction_summary", options, &summary)
 	if err != nil {
 		err = fmt.Errorf("failed to fetch get transactions summary: %w", err)
 	}

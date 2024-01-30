@@ -10,9 +10,6 @@ package coinbase
 import (
 	"context"
 	"fmt"
-	"net/http"
-
-	"github.com/google/go-querystring/query"
 )
 
 type ListAccountsResponse struct {
@@ -38,24 +35,8 @@ type AccountListOptions struct {
 // List retrieves a list of authenticated accounts for the current user.
 // https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getaccounts
 func (s *AccountService) List(ctx context.Context, options *AccountListOptions) (*ListAccountsResponse, error) {
-	url := s.client.baseURL + "/api/v3/brokerage/accounts"
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to generate list accounts request: %w", err)
-	}
-
-	if options != nil {
-		qs, err := query.Values(options)
-		if err != nil {
-			return nil, fmt.Errorf("failed to convert AccountListOptions to query string: %w", err)
-		}
-
-		req.URL.RawQuery = qs.Encode()
-	}
-
 	var accountsResp ListAccountsResponse
-	err = s.client.do(req, http.StatusOK, &accountsResp)
+	err := s.client.get(ctx, s.client.baseURL+"/api/v3/brokerage/accounts", options, &accountsResp)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch list of authenticated accounts for the current user: %w", err)
 	}

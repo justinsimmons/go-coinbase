@@ -10,9 +10,6 @@ package coinbase
 import (
 	"context"
 	"fmt"
-	"net/http"
-
-	"github.com/google/go-querystring/query"
 )
 
 type ExpiringContractStatus string
@@ -39,28 +36,12 @@ type listProductsResponse struct {
 }
 
 func (s *ProductsService) List(ctx context.Context, options *ListProductsOptions) ([]Product, error) {
-	url := s.client.baseURL + "/api/v3/brokerage/products"
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create list products HTTP request: %w", err)
-	}
-
-	if options != nil {
-		v, err := query.Values(options)
-		if err != nil {
-			return nil, fmt.Errorf("failed to map query params: %w", err)
-		}
-
-		req.URL.RawQuery = v.Encode()
-	}
-
 	var productsResp listProductsResponse
-	err = s.client.do(req, http.StatusOK, &productsResp)
+
+	err := s.client.get(ctx, s.client.baseURL+"/api/v3/brokerage/products", options, &productsResp)
 	if err != nil {
 		err = fmt.Errorf("failed to fetch list of products: %w", err)
 	}
 
 	return productsResp.Products, err
-
 }

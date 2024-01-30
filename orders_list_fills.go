@@ -10,10 +10,7 @@ package coinbase
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"time"
-
-	"github.com/google/go-querystring/query"
 )
 
 type TradeType string
@@ -65,23 +62,10 @@ type ListFillsResponse struct {
 }
 
 // Get a list of fills filtered by optional query parameters (product_id, order_id, etc).
-func (s *OrdersService) ListFills(ctx context.Context, options ListOrderFillsOptions) (any, error) {
-	url := s.client.baseURL + "/api/v3/brokerage/orders/historical/fills"
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create list fills HTTP request: %w", err)
-	}
-
-	qs, err := query.Values(options)
-	if err != nil {
-		return nil, fmt.Errorf("failed to convert ListOrderFillsOptions to query string: %w", err)
-	}
-
-	req.URL.RawQuery = qs.Encode()
-
+func (s *OrdersService) ListFills(ctx context.Context, options ListOrderFillsOptions) (*ListFillsResponse, error) {
 	var fills ListFillsResponse
-	err = s.client.do(req, http.StatusOK, &fills)
+
+	err := s.client.get(ctx, s.client.baseURL+"/api/v3/brokerage/orders/historical/fills", &options, &fills)
 	if err != nil {
 		err = fmt.Errorf("failed to list historical fills: %w", err)
 	}

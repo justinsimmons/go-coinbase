@@ -23,6 +23,7 @@ type ListPortfoliosResponse struct {
 // List gets a list of all portfolios of a user.
 func (s *PortfoliosService) List(ctx context.Context, options *ListPortfoliosOptions) (*ListPortfoliosResponse, error) {
 	var portfolios ListPortfoliosResponse
+
 	err := s.client.get(ctx, s.client.baseURL+"/api/v3/brokerage/portfolios", options, &portfolios)
 	if err != nil {
 		err = fmt.Errorf("failed to get list of portfolios: %w", err)
