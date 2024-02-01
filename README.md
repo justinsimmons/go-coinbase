@@ -84,6 +84,7 @@ NOTE: Using the [context](https://godoc.org/context) package, one can easily pas
 | [Commit Convert Trade](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_commitconverttrade) | Commits a convert trade with a specified trade ID, source currency, and target currency. | ❌ |
 | [Get Convert Trade](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getconverttrade) | Gets a list of information about a convert trade with a specified trade ID, source currency, and target currency. | ❌ |
 | [Get Unix Time](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getunixtime) | Get the current time from the Coinbase Advanced API. | ✅ |
+| [Allocate Portfolio](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_allocateportfolio) | Allocate more funds to an isolated position in your Perpetuals portfolio. | ✅ |
 
 ✅ = Implemented and fully tested.
 ⚠️ = Implemented but not able to test.
