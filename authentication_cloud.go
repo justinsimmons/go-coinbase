@@ -26,7 +26,7 @@ const (
 	issuer         = "coinbase-cloud"        // Issuer of the service.
 	serviceName    = "retail_rest_api_proxy" // Name of the Coinbase service we are generating the token for.
 	jwtTTL         = time.Minute * 2         // Coinbase specifies JWTs will expire after two minutes, after which all requests are unauthenticated.
-	creationBuffer = time.Second * -35       // Minimum buffer required for coinbase to accept an auth tokens issued time.
+	creationBuffer = time.Second * -45       // Minimum buffer required for coinbase to accept an auth tokens issued time.
 )
 
 // Handles cloud API key authentication used to access the Advanced Trade API.

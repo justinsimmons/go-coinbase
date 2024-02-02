@@ -62,7 +62,7 @@ type ListFillsResponse struct {
 }
 
 // Get a list of fills filtered by optional query parameters (product_id, order_id, etc).
-func (s *OrdersService) ListFills(ctx context.Context, options ListOrderFillsOptions) (*ListFillsResponse, error) {
+func (s *OrdersService) ListFills(ctx context.Context, options *ListOrderFillsOptions) (*ListFillsResponse, error) {
 	var fills ListFillsResponse
 
 	err := s.client.get(ctx, s.client.baseURL+"/api/v3/brokerage/orders/historical/fills", &options, &fills)

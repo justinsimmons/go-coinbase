@@ -23,7 +23,7 @@ const (
 
 type ListOrdersOptions struct {
 	ProductID            *string               `url:"product_id,omitempty"`             // Optional string of the product ID. Defaults to null, or fetch for all products.
-	OrderStatus          []string              `url:"order_status,omitempty"`           // A list of order statuses.
+	OrderStatus          []OrderStatus         `url:"order_status,omitempty"`           // A list of order statuses.
 	Limit                *int32                `url:"limit,omitempty"`                  // Pagination limit with a default of 1000 (which is also the maximum). If has_next is true, additional orders are available to be fetched with pagination; also the cursor value in the response can be passed as cursor parameter in the subsequent request.
 	StartDate            *time.Time            `url:"start_date,omitempty"`             // Start date to fetch orders from, inclusive.
 	EndDate              *time.Time            `url:"end_date,omitempty"`               // An optional end date for the query window, exclusive. If provided only orders with creation time before this date will be returned.
