@@ -37,18 +37,32 @@ type CoinbaseError struct {
 	Details []ErrorDetails `json:"details"`
 }
 
+func (e CoinbaseError) GetCode() int {
+	if e.Code == nil {
+		return 0
+	}
+
+	return int(*e.Code)
+}
+
+func (e CoinbaseError) GetMessage() string {
+	if e.Message == nil {
+		return ""
+	}
+
+	return *e.Message
+}
+
+func (e CoinbaseError) getError() string {
+	if e.Err == nil {
+		return ""
+	}
+
+	return *e.Err
+}
+
 func (e CoinbaseError) Error() string {
-	var err string
-	var message string
 	var details strings.Builder
-
-	if e.Err != nil {
-		err = *e.Err
-	}
-
-	if e.Message != nil {
-		message = *e.Message
-	}
 
 	details.WriteRune('[') // Always returns nil err.
 
@@ -65,9 +79,9 @@ func (e CoinbaseError) Error() string {
 
 	return fmt.Sprintf(
 		`{"error": "%s", "code": %v, "message": "%s", "details": %s}`,
-		err,
-		e.Code,
-		message,
+		e.getError(),
+		e.GetCode(),
+		e.GetMessage(),
 		details.String(),
 	)
 }

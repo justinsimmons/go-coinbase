@@ -25,8 +25,8 @@ import (
 const (
 	issuer         = "coinbase-cloud"        // Issuer of the service.
 	serviceName    = "retail_rest_api_proxy" // Name of the Coinbase service we are generating the token for.
-	jwtTTL         = time.Minute * 2         // Coinbase specifies JWTs will expire after two minutes, after which all requests are unauthenticated.
-	creationBuffer = time.Second * -45       // Minimum buffer required for coinbase to accept an auth tokens issued time.
+	jwtExpiration  = time.Minute * 2         // Coinbase specifies JWTs will expire after two minutes, after which all requests are unauthenticated.
+	creationBuffer = time.Minute * -2        // Minimum buffer required for coinbase to accept an auth tokens issued time.
 )
 
 // Handles cloud API key authentication used to access the Advanced Trade API.
@@ -66,9 +66,9 @@ func (a cloudAuthenticator) Authenticate(req *http.Request) error {
 		jwt.MapClaims{
 			"sub": a.apiKey,
 			"iss": issuer,
-			// "iat": now.Unix(),
+			"iat": now.Unix(),
 			"nbf": now.Unix(),
-			"exp": now.Add(jwtTTL).Unix(),
+			"exp": now.Add(jwtExpiration).Unix(),
 			"aud": serviceName,
 			"uri": fmt.Sprintf("%s %s%s", req.Method, req.URL.Host, req.URL.Path),
 		},
