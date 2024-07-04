@@ -14,14 +14,14 @@ import (
 	"time"
 )
 
-type CoinbaseUnixTime struct {
+type CoinbaseServerTime struct {
 	ISO          *string `json:"iso"`          // An ISO-8601 representation of the timestamp.
 	EpochSeconds *string `json:"epochSeconds"` // A second-precision representation of the timestamp.
 	EpochMillis  *string `json:"epochMillis"`  // A millisecond-precision representation of the timestamp.
 }
 
 // UnixMilli returns the local Time corresponding to the given Unix time, msec milliseconds since January 1, 1970 UTC.
-func (ut CoinbaseUnixTime) UnixMilli() (time.Time, error) {
+func (ut CoinbaseServerTime) UnixMilli() (time.Time, error) {
 	if ut.EpochMillis == nil {
 		return time.Time{}, fmt.Errorf("unable to determine time from null EpochMillis")
 	}
@@ -34,13 +34,14 @@ func (ut CoinbaseUnixTime) UnixMilli() (time.Time, error) {
 	return time.UnixMilli(i), nil
 }
 
-// GetUnixTime gets the current time from the Coinbase Advanced API.
-func (s *CommonService) GetUnixTime(ctx context.Context) (*CoinbaseUnixTime, error) {
-	var t CoinbaseUnixTime
+// GetServerTime gets the current time from the Coinbase Advanced API.
+// https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getservertime/
+func (s *PublicService) GetServerTime(ctx context.Context) (*CoinbaseServerTime, error) {
+	var t CoinbaseServerTime
 
 	err := s.client.get(ctx, s.client.baseURL+"/api/v3/brokerage/time", nil, &t)
 	if err != nil {
-		err = fmt.Errorf("failed to get unix time: %w", err)
+		err = fmt.Errorf("failed to get Coinbase's server time: %w", err)
 	}
 
 	return &t, err

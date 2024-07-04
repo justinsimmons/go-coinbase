@@ -39,7 +39,7 @@ Some APIs have optional parameters that  can be passed:
 client := coinbase.NewWithCloud("api-key", "api-secret")
 
 // Will filter the orders response to only return a specific product.
-opt := &ListOrdersOptions{ProductID: coinbase.String("BTC-USD")}
+opt := &coinbase.ListOrdersOptions{ProductID: coinbase.String("BTC-USD")}
 
 // Gets a list of orders that can be filterd with filtered by optional parameters.
 orders, err := client.Orders.List(context.Background(), opt)

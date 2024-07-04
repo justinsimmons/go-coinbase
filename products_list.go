@@ -27,7 +27,7 @@ type ListProductsOptions struct {
 	ProductType            *ProductType            `url:"product_type,omitempty"` // Type of products to return.
 	ProductIDs             []string                `url:"product_ids,omitempty"`  // List of product IDs to return.
 	ContractExpiryType     *ContractExpiryType     `url:"contract_expiry_type,omitempty"`
-	ExpiringContractStatus *ExpiringContractStatus `url:"expiring_contract_status,omitempty"`
+	ExpiringContractStatus *ExpiringContractStatus `url:"expiring_contract_status,omitempty"` // Status of expiring contract products to return. Default is UNEXPIRED.
 }
 
 type listProductsResponse struct {

@@ -29,13 +29,15 @@ type Client struct {
 	baseURL    string       // Base URL of the Advanced Trade REST API.
 	httpClient *http.Client // Client used to make HTTP calls.
 
-	Accounts  *AccountService    // Interface with the Advanced Trade REST API Accounts APIs.
-	Orders    *OrdersService     // Interface with the Advanced Trade REST API Orders APIs.
-	Products  *ProductsService   // Interface with the Advanced Trade REST API Products API.
-	Fees      *FeesService       // Interface with the Advanced Trade REST API Fees API.
-	Portfolio *PortfoliosService // Interface with the Advanced Trade REST API Portfolios API.
-	Futures   *FuturesService    // Interface with the Advanced Trade REST API Futures API.
-	Common    *CommonService     // Interface with the Advanced Trade REST API Common API.
+	Accounts       *AccountService        // Interface with the Advanced Trade REST API Accounts APIs.
+	Orders         *OrdersService         // Interface with the Advanced Trade REST API Orders APIs.
+	Products       *ProductsService       // Interface with the Advanced Trade REST API Products API.
+	Fees           *FeesService           // Interface with the Advanced Trade REST API Fees API.
+	Portfolio      *PortfoliosService     // Interface with the Advanced Trade REST API Portfolios API.
+	Public         *PublicService         // Interface with the Advanced Trade REST API's Public API.
+	PaymentMethods *PaymentMethodsService // Interface with the Advanced Trade REST API's Payment Methods API.
+	Futures        *FuturesService        // Interface with the Advanced Trade REST API Futures API.
+	Common         *CommonService         // Interface with the Advanced Trade REST API Common API.
 }
 
 type service struct {
@@ -92,12 +94,16 @@ func New(opts ...option) *Client {
 	commonService := service{client: &c}
 
 	c.Accounts = (*AccountService)(&commonService)
-	c.Orders = (*OrdersService)(&commonService)
 	c.Products = (*ProductsService)(&commonService)
-	c.Fees = (*FeesService)(&commonService)
+	c.Orders = (*OrdersService)(&commonService)
 	c.Portfolio = (*PortfoliosService)(&commonService)
-	c.Futures = (*FuturesService)(&commonService)
-	c.Common = (*CommonService)(&commonService)
+	c.Fees = (*FeesService)(&commonService)
+	// c.Converts = (*ConvertsService)(&commonService)
+	c.Public = (*PublicService)(&commonService)
+	c.PaymentMethods = (*PaymentMethodsService)(&commonService)
+
+	c.Futures = (*FuturesService)(&commonService) // TODO: Depreciate
+	c.Common = (*CommonService)(&commonService)   // TODO: Depreciate
 
 	for _, opt := range opts {
 		if opt != nil {

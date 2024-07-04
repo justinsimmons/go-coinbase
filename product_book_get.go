@@ -16,7 +16,7 @@ type getProductBookResponse struct {
 	PriceBook PriceBook `json:"pricebook"`
 }
 
-type getProductBookOptions struct {
+type GetProductBookOptions struct {
 	ProductID string `url:"product_id"`
 	Limit     *int   `url:"limit,omitempty"`
 }
@@ -24,7 +24,7 @@ type getProductBookOptions struct {
 // GetProductBook gets a list of bids/asks for a single product.
 // The amount of detail shown can be customized with the limit parameter.
 func (s *ProductsService) GetProductBook(ctx context.Context, id string, limit *int) (*PriceBook, error) {
-	options := getProductBookOptions{
+	options := GetProductBookOptions{
 		ProductID: id,
 		Limit:     limit,
 	}

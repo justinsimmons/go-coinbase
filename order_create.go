@@ -77,7 +77,7 @@ type CreateOrderResponse struct {
 	OrderConfiguration *OrderConfiguration        `json:"order_configuration"`
 }
 
-func (s *OrdersService) Create(ctx context.Context, options CreateOrderOptions) (any, error) {
+func (s *OrdersService) Create(ctx context.Context, options CreateOrderOptions) (*CreateOrderResponse, error) {
 	b, err := json.Marshal(&options)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal OrderRequest to JSON: %w", err)
