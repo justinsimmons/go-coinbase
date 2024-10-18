@@ -12,7 +12,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"net/http"
 )
 
 type CancelOrderFailureReason string
@@ -31,6 +30,10 @@ type CancelledOrder struct {
 	ID            string                    `json:"order_id"` // The IDs of order cancel request was initiated for.
 }
 
+type cancelOrdersRequest struct {
+	OrderIDs []string `json:"order_ids"`
+}
+
 type cancelOrdersResponse struct {
 	Results []CancelledOrder `json:"results"` // The result of initiated cancel requests.
 }
@@ -42,27 +45,18 @@ type cancelOrdersResponse struct {
 // InvalidArgument error code will be returned with an error message denoting the limit
 // Too many orderIDs entered, limit is _.
 func (s *OrdersService) Cancel(ctx context.Context, ids ...string) ([]CancelledOrder, error) {
-	// Using anonymous struct for now since it is single use.
-	b, err := json.Marshal(&struct {
-		OrderIDs []string `json:"order_ids"`
-	}{OrderIDs: ids})
+	b, err := json.Marshal(&cancelOrdersRequest{OrderIDs: ids})
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal cancel order ids to JSON: %w", err)
 	}
 
-	url := s.client.baseURL + "/api/v3/brokerage/orders/batch_cancel"
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewBuffer(b))
-	if err != nil {
-		return nil, fmt.Errorf("failed to generate cancel orders HTTP request: %w", err)
-	}
+	u := s.client.baseURL + "/api/v3/brokerage/orders/batch_cancel"
 
 	var cancelResp cancelOrdersResponse
-	err = s.client.do(req, http.StatusOK, &cancelResp)
+	err = s.client.post(ctx, u, bytes.NewBuffer(b), &cancelResp)
 	if err != nil {
 		// TODO: Parse and create sentinal error for: "Too many orderIDs entered, limit is _".
-
-		err = fmt.Errorf("failed to cancel orders '%v': %w", ids, err)
+		return nil, fmt.Errorf("failed to cancel orders '%v': %w", ids, err)
 	}
 
 	return cancelResp.Results, err

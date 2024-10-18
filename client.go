@@ -34,10 +34,10 @@ type Client struct {
 	Products       *ProductsService       // Interface with the Advanced Trade REST API Products API.
 	Fees           *FeesService           // Interface with the Advanced Trade REST API Fees API.
 	Portfolio      *PortfoliosService     // Interface with the Advanced Trade REST API Portfolios API.
-	Public         *PublicService         // Interface with the Advanced Trade REST API's Public API.
-	PaymentMethods *PaymentMethodsService // Interface with the Advanced Trade REST API's Payment Methods API.
 	Futures        *FuturesService        // Interface with the Advanced Trade REST API Futures API.
-	Common         *CommonService         // Interface with the Advanced Trade REST API Common API.
+	Public         *PublicService         // Interface with the Advanced Trade REST API's Public API.
+	Converts       *ConvertsService       // Interface with the Advanced Trade REST API Converts API.
+	PaymentMethods *PaymentMethodsService // Interface with the Advanced Trade REST API's Payment Methods API.
 }
 
 type service struct {
@@ -78,16 +78,17 @@ func WithCustomAuthenticator(authenticator Authenticator) func(*Client) {
 	}
 }
 
-// New creates a new Coinbase Advanced Trade REST API client.
+// NewClient creates a new Coinbase Advanced Trade REST API client.
 // By default no authentication schema has been added. Coinbase will block any unauthenticated
 // requests.
 //   - To use Legacy API key authentication prefer NewWithLegacy()
 //   - To use Cloud API Trading Key authentication prefer NewWithCloud()
 //   - To use a custom authentication schema use the WithCustomAuthenticator option as an argument to this method.
-func New(opts ...option) *Client {
+func NewClient(opts ...option) *Client {
 	c := Client{
-		baseURL:    productionURI,
-		httpClient: http.DefaultClient,
+		baseURL:       productionURI,
+		httpClient:    http.DefaultClient,
+		authenticator: unauthenticated{}, // Default to unauthenticated user.
 	}
 
 	// Reuse a single struct instead of allocating one for each service on the heap.
@@ -98,12 +99,10 @@ func New(opts ...option) *Client {
 	c.Orders = (*OrdersService)(&commonService)
 	c.Portfolio = (*PortfoliosService)(&commonService)
 	c.Fees = (*FeesService)(&commonService)
-	// c.Converts = (*ConvertsService)(&commonService)
+	c.Converts = (*ConvertsService)(&commonService)
 	c.Public = (*PublicService)(&commonService)
 	c.PaymentMethods = (*PaymentMethodsService)(&commonService)
-
-	c.Futures = (*FuturesService)(&commonService) // TODO: Depreciate
-	c.Common = (*CommonService)(&commonService)   // TODO: Depreciate
+	c.Futures = (*FuturesService)(&commonService)
 
 	for _, opt := range opts {
 		if opt != nil {
@@ -117,7 +116,7 @@ func New(opts ...option) *Client {
 // New creates a new Coinbase Advanced Trade REST API client, using legacy API key authentication.
 // Please note some of he newer endpoints will not work unless you use the new Cloud API Trading Keys.
 func NewWithLegacy(apiKey string, apiSecret string, opts ...option) *Client {
-	c := New(opts...)
+	c := NewClient(opts...)
 
 	c.authenticator = legacyAuthenticator{
 		apiKey:    apiKey,
@@ -130,7 +129,7 @@ func NewWithLegacy(apiKey string, apiSecret string, opts ...option) *Client {
 // New creates a new Coinbase Advanced Trade REST API client, using Cloud API Trading Keys
 // for authentication.
 func NewWithCloud(apiKey string, apiSecret string, opts ...option) (*Client, error) {
-	c := New(opts...)
+	c := NewClient(opts...)
 
 	key, err := parsePrivateKey(apiSecret)
 	if err != nil {

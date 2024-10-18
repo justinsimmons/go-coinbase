@@ -3,6 +3,10 @@ Go SDK for Coinbase's v3 [Advanced Trade REST API](https://docs.cloud.coinbase.c
 
 This does not include the [Advanced Trade WebSocket](https://docs.cloud.coinbase.com/advanced-trade-api/docs/ws-overview).
 
+## Project Status
+
+Coinbase is pretty rapidly updating and modifing their API's, which makes it hard to keep on top of new features. I am actively using this repo in a few side projects and will maintain it. For now I will not be implementing new endpoints like the converts APIs any time soon, as I do not use them for any of my side projects. I dont really want to invest the time if I am the only one using the SDK. If you would like any new features implemented or encounter a bug please open a Github issue and I will go ahead and jump on them. Thanks!
+
 ## Installation
 
 go-coinbase is compatible with Go releases in module mode:
@@ -50,10 +54,28 @@ NOTE: Using the [context](https://godoc.org/context) package, one can easily pas
 
 # Supported APIs
 
+## Accounts
+
 | API | Description | Supported |
 | --- | ----------- | --------- |
 | [List Accounts](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getaccounts) | Get a list of authenticated accounts for the current user. | ✅ |
 | [Get Account](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getaccount) |Get a list of information about an account, given an account UUID. | ✅ |
+
+## Products
+
+| API | Description | Supported |
+| --- | ----------- | --------- |
+| [Get Best Bid/Ask](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getbestbidask) | Get the best bid/ask for all products. A subset of all products can be returned instead by using the product_ids input. |  ✅ |
+| [Get Product Book](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getbestbidask) | Get a list of bids/asks for a single product. The amount of detail shown can be customized with the limit parameter. | ✅ |
+| [List Products](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getproducts) | Get a list of the available currency pairs for trading. | ✅ |
+| [Get Product](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getproduct) | Get information on a single product by product ID. | ✅ |
+| [Get Product Candles](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getcandles) | Get rates for a single product by product ID, grouped in buckets. | ✅ |
+| [Get Market Trades](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getmarkettrades) | Get snapshot information, by product ID, about the last trades (ticks), best bid/ask, and 24h volume. | ✅ |
+
+## Orders
+
+| API | Description | Supported |
+| --- | ----------- | --------- |
 | [Create Order](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_postorder) | Create an order with a specified product_id (asset-pair), side (buy/sell), etc. | ✅ |
 | [Cancel Orders](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_cancelorders) | Initiate cancel requests for one or more orders. | ✅ |
 | [Edit Order](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_editorder) | Edit an order with a specified new `size`, or new `price`. | ✅ |
@@ -61,30 +83,73 @@ NOTE: Using the [context](https://godoc.org/context) package, one can easily pas
 | [List Orders](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_gethistoricalorders) | Get a list of orders filtered by optional query parameters (`product_id`, `order_status`, etc). | ✅ |
 | [List Fills](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getfills) | Get a list of fills filtered by optional query parameters (`product_id`, `order_id`, etc). | ✅ |
 | [Get Order](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_gethistoricalorder) | Get a single order by order ID. | ✅ |
-| [Get Best Bid/Ask](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getbestbidask) | Get the best bid/ask for all products. A subset of all products can be returned instead by using the product_ids input. |  ✅ |
-| [Get Product Book](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getbestbidask) | Get a list of bids/asks for a single product. The amount of detail shown can be customized with the limit parameter. | ✅ |
-| [List Products](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getproducts) | Get a list of the available currency pairs for trading. | ✅ |
-| [Get Product](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getproduct) | Get information on a single product by product ID. | ✅ |
-| [Get Product Candles](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getcandles) | Get rates for a single product by product ID, grouped in buckets. | ✅ |
-| [Get Market Trades](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getmarkettrades) | Get snapshot information, by product ID, about the last trades (ticks), best bid/ask, and 24h volume. | ✅ |
+| [Preview Order](https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_previeworder/) | Preview the results of an order request before sending. | ❌ |
+
+## Portfolios
+
+| API | Description | Supported |
+| --- | ----------- | --------- |
 | [List Portfolios](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getportfolios) | Get a list of all portfolios of a user. | ✅ |
 | [Create Portfolio](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_createportfolio) | Create a portfolio. | ✅ |
 | [Move Portfolio Funds](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_moveportfoliofunds) | Transfer funds between portfolios. | ✅ |
 | [Get Portfolio Breakdown](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getportfoliobreakdown) | Get the breakdown of a portfolio by portfolio ID. | ❌ |
 | [Delete Portfolio](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_deleteportfolio) | Delete a portfolio by portfolio ID. | ✅ |
 | [Edit Portfolio](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_editportfolio) | Modify a portfolio by portfolio ID. | ✅ |
-| [Get Futures Balance Summary](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getfcmbalancesummary) | Get information on your balances related to Coinbase Financial Markets (CFM) futures trading. | ❌ |
-| [List Futures Positions](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getfcmpositions) | Get a list of all open positions in CFM futures products. | ❌ |
-| [Get Futures Position](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getfcmposition) | Get the position of a specific CFM futures product. | ❌ |
-| [Schedule Futures Sweep](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_schedulefcmsweep) | Schedule a sweep of funds from your CFTC-regulated futures account to your Coinbase Inc. USD Spot wallet. | ❌ |
-| [List Futures Sweeps](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getfcmsweeps) | Get information on your pending and/or processing requests to sweep funds from your CFTC-regulated futures account to your Coinbase Inc. USD Spot wallet. | ❌ |
-| [Cancel Pending Futures Sweep](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_cancelfcmsweep) | Cancel your pending sweep of funds from your CFTC-regulated futures account to your Coinbase Inc. USD Spot wallet. | ✅ |
-| [Get Transactions Summary](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_gettransactionsummary) | Get a summary of transactions with fee tiers, total volume, and fees. | ✅ |
-| [Create Convert Quote](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_createconvertquote) | Create a convert quote with a specified source currency, target currency, and amount. | ❌ |
-| [Commit Convert Trade](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_commitconverttrade) | Commits a convert trade with a specified trade ID, source currency, and target currency. | ❌ |
-| [Get Convert Trade](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getconverttrade) | Gets a list of information about a convert trade with a specified trade ID, source currency, and target currency. | ❌ |
-| [Get Unix Time](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getunixtime) | Get the current time from the Coinbase Advanced API. | ✅ |
-| [Allocate Portfolio](https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_allocateportfolio) | Allocate more funds to an isolated position in your Perpetuals portfolio. | ✅ |
+| [Close Position](https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_closeposition/) | Places an order to close any open positions for a specified product_id. | ❌ |
+| [Get Intraday Margin Setting](https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getintradaymarginsetting/) | Get the status of whether your account is opted-in to receive increased leverage on futures trades on weekdays from 8am-4pm ET. During these hours, intraday margin rates apply, which are lower than the standard margin requirement needed to hold a futures position overnight. | ❌ |
+| [Set Intraday Margin Setting](https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_setintradaymarginsetting/) | Setting your margin window to INTRADAY opts you in to receive increased leverage on futures trades on weekdays from 8am-4pm ET. During these hours, intraday margin rates apply, which are lower than the standard margin requirement needed to hold a futures position overnight. You can opt out at anytime. | ❌ |
+| [Get Current Margin Window](https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getcurrentmarginwindow/) | Get the current margin window to determine whether intraday or overnight margin rates are in effect. | ❌ |
+| [Allocate Portfolio](https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_allocateportfolio/) | Allocate more funds to an isolated position in your Perpetuals portfolio. | ❌ |
+| [Get Perpetuals Portfolio Summary](https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getintxportfoliosummary/) | Get a summary of your Perpetuals portfolio | ❌ |
+| [List Perpetuals Positions](https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getintxpositions/) | Get a list of open positions in your Perpetuals portfolio | ❌ |
+| [Get Perpetuals Position](https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getintxposition/) | Get a specific open position in your Perpetuals portfolio. | ❌ |
+| [Get Portfolio Balances](https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getintxbalances/) | Get a list of asset balances on Intx for a given Portfolio. | ❌ |
+| [Opt In or Out of Multi Asset Collateral](https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_intxmultiassetcollateral/) | Enable or Disable Multi Asset Collateral for a given Portfolio. | ❌ |
+
+## Futures
+
+| API | Description | Supported |
+| --- | ----------- | --------- |
+| [Get Futures Balance Summary](https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getfcmbalancesummary/) | Get information on your balances related to Coinbase Financial Markets (CFM) futures trading. | ✅ |
+| [List Futures Positions](https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getfcmpositions/) | Get a list of all open positions in CFM futures products. | ✅ |
+| [Get Futures Position](https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getfcmposition/) | Get the position of a specific CFM futures product | ✅ |
+| [Schedule Futures Sweep](https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_schedulefcmsweep/) | Schedule a sweep of funds from your CFTC-regulated futures account to your Coinbase Inc. USD Spot wallet. | ✅ |
+| [List Futures Sweeps](https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getfcmsweeps/) | Get information on your pending and/or processing requests to sweep funds from your CFTC-regulated futures account to your Coinbase Inc. USD Spot wallet. | ✅ |
+| [Cancel Pending Futures Sweep](https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_cancelfcmsweep/) | Cancel your pending sweep of funds from your CFTC-regulated futures account to your Coinbase Inc. USD Spot wallet. | ✅ |
+
+
+## Fees
+
+| API | Description | Supported |
+| --- | ----------- | --------- |
+| [Get Transactions Summary](https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_gettransactionsummary/) | Get a summary of transactions with fee tiers, total volume, and fees. | ✅ |
+
+## Converts 
+
+| API | Description | Supported |
+| --- | ----------- | --------- |
+| [Create Convert Quote](https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_createconvertquote/) | Create a convert quote with a specified source currency, target currency, and amount. | ❌ |
+| [Commit Convert Trade](https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_commitconverttrade/) | Commits a convert trade with a specified trade ID, source currency, and target currency. | ❌ |
+| [Get Convert Trade](https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getconverttrade/) | Gets a list of information about a convert trade with a specified trade ID, source currency, and target currency. | ❌ |
+
+## Public 
+
+| API | Description | Supported |
+| --- | ----------- | --------- |
+| [Get Server Time](https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getservertime/) | Get the current time from the Coinbase Advanced API. | ✅ |
+| [Get Public Product Book](https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getpublicproductbook/) | Get a list of bids/asks for a single product. The amount of detail shown can be customized with the limit parameter. | ✅ |
+| [List Public Products](https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getpublicproducts/) | Get a list of the available currency pairs for trading. | ✅ |
+| [Get Public Product](https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getpublicproduct/) | Get information on a single product by product ID. | ✅ |
+| [Get Public Product Candles](https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getpubliccandles/) | Get rates for a single product by product ID, grouped in buckets. | ✅ |
+| [Get Public Market Trades](https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getpublicmarkettrades/) | Get snapshot information by product ID about the last trades (ticks) and best bid/ask. | ✅ |
+
+## Payment Methods
+
+| API | Description | Supported |
+| --- | ----------- | --------- |
+| [List Payment Methods](https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getpaymentmethods/) | Get a list of payment methods for the current user. | ✅ |
+| [Get Payment Method](https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getpaymentmethod/) | Get information about a payment method for the current user. | ✅ |
+
 
 ✅ = Implemented and fully tested.
 ⚠️ = Implemented but not able to test.

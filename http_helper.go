@@ -50,10 +50,21 @@ func handleRequestError(resp *http.Response) error {
 	return &cbError
 }
 
-func (c *Client) do(r *http.Request, successCode int, v any) error {
+// doWithAuthentication adds authentication to the HTTP request with the clients configured
+// authentication method. An error is returned if a method is not configured. If you wish
+// to proceed as an unauthenticated user set the authentication method to unauthenticated{}.
+func (c *Client) doWithAuthentication(r *http.Request, successCode int, v any) error {
 	// Add required authentication to request.
+	if c.authenticator == nil {
+		return fmt.Errorf("client is missing authentication method, please regenerate the client with NewClient() to use in an unauthenticated state.")
+	}
+
 	c.authenticator.Authenticate(r)
 
+	return c.do(r, successCode, v)
+}
+
+func (c *Client) do(r *http.Request, successCode int, v any) error {
 	r.Header.Add("Accept", "application/json")
 
 	resp, err := c.httpClient.Do(r)
@@ -95,7 +106,7 @@ func (c *Client) get(ctx context.Context, url string, params any, v any) error {
 		req.URL.RawQuery = qs.Encode()
 	}
 
-	err = c.do(req, http.StatusOK, v)
+	err = c.doWithAuthentication(req, http.StatusOK, v)
 	if err != nil {
 		return err
 	}
@@ -110,7 +121,7 @@ func (c *Client) post(ctx context.Context, url string, body io.Reader, v any) er
 		return fmt.Errorf("failed to create HTTP request: %w", err)
 	}
 
-	err = c.do(req, http.StatusOK, v)
+	err = c.doWithAuthentication(req, http.StatusOK, v)
 	if err != nil {
 		return err
 	}
@@ -125,7 +136,7 @@ func (c *Client) put(ctx context.Context, url string, body io.Reader, v any) err
 		return fmt.Errorf("failed to create HTTP request: %w", err)
 	}
 
-	err = c.do(req, http.StatusOK, v)
+	err = c.doWithAuthentication(req, http.StatusOK, v)
 	if err != nil {
 		return err
 	}
@@ -144,7 +155,7 @@ func (c *Client) delete(ctx context.Context, url string) error {
 	// If it does we can catch it in here and then reevaluate.
 	v := map[string]any{}
 
-	err = c.do(req, http.StatusOK, &v)
+	err = c.doWithAuthentication(req, http.StatusOK, &v)
 	if err != nil {
 		return err
 	}

@@ -26,7 +26,7 @@ func (s *FuturesService) CancelPendingSweep(ctx context.Context) (bool, error) {
 	}
 
 	var resp cancelPendingFuturesSweepResponse
-	err = s.client.do(req, http.StatusOK, &resp)
+	err = s.client.doWithAuthentication(req, http.StatusOK, &resp)
 	if err != nil {
 		return false, fmt.Errorf("failed to cancel pending futures sweep: %w", err)
 	}

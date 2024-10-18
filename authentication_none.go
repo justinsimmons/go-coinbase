@@ -7,4 +7,12 @@
 
 package coinbase
 
-type CommonService service
+import "net/http"
+
+// Unauthenticated user, who is still able to hit any of the public API endpoints.
+type unauthenticated struct{}
+
+// Authenticate satisfies the Authenticator interface but performs no authentication.
+func (a unauthenticated) Authenticate(req *http.Request) error {
+	return nil
+}
