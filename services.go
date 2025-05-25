@@ -7,4 +7,10 @@
 
 package coinbase
 
-type AccountService service
+// AccountsService handles communication with the accounts related methods of
+// the Coinbase Advanced Trade API.
+type AccountsService service
+
+// ConvertsService handles communication with the convert trades related
+// methods of the Coinbase Advanced Trade API.
+type ConvertsService service

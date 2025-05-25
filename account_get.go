@@ -19,7 +19,7 @@ type getAccountResponse struct {
 // Get a list of information about an account, given an account UUID.
 //
 // https://docs.cdp.coinbase.com/coinbase-app/trade/reference/retailbrokerageapi_getaccount
-func (s *AccountService) Get(ctx context.Context, id string) (*Account, error) {
+func (s *AccountsService) Get(ctx context.Context, id string) (*Account, error) {
 	u := fmt.Sprintf("%s/api/v3/brokerage/accounts/%s", s.client.baseURL, id)
 
 	var accountResp getAccountResponse

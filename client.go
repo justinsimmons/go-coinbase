@@ -29,7 +29,7 @@ type Client struct {
 	baseURL    string       // Base URL of the Advanced Trade REST API.
 	httpClient *http.Client // Client used to make HTTP calls.
 
-	Accounts       *AccountService        // Interface with the Advanced Trade REST API Accounts APIs.
+	Accounts       *AccountsService       // Interface with the Advanced Trade REST API Accounts APIs.
 	Orders         *OrdersService         // Interface with the Advanced Trade REST API Orders APIs.
 	Products       *ProductsService       // Interface with the Advanced Trade REST API Products API.
 	Fees           *FeesService           // Interface with the Advanced Trade REST API Fees API.
@@ -94,7 +94,7 @@ func NewClient(opts ...option) *Client {
 	// Reuse a single struct instead of allocating one for each service on the heap.
 	commonService := service{client: &c}
 
-	c.Accounts = (*AccountService)(&commonService)
+	c.Accounts = (*AccountsService)(&commonService)
 	c.Products = (*ProductsService)(&commonService)
 	c.Orders = (*OrdersService)(&commonService)
 	c.Portfolio = (*PortfoliosService)(&commonService)

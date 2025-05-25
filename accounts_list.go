@@ -29,7 +29,7 @@ type ListAccountsOptions struct {
 // Get a list of authenticated Advanced Trade accounts for the current user.
 //
 // https://docs.cdp.coinbase.com/coinbase-app/trade/reference/retailbrokerageapi_getaccounts
-func (s *AccountService) List(
+func (s *AccountsService) List(
 	ctx context.Context,
 	options *ListAccountsOptions,
 ) (*ListAccountsResponse, error) {
