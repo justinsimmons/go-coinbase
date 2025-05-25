@@ -13,39 +13,37 @@ import (
 )
 
 type GetTransactionsSummaryOptions struct {
-	ProductType        *string             `url:"product_type,omitempty"`
-	ContractExpiryType *ContractExpiryType `url:"contract_expiry_type,omitempty"`
-}
-
-type FeeTier struct {
-	PricingTier  *string `json:"pricing_tier"`   // Pricing tier for user, determined by notional (USD) volume.
-	USDFrom      *string `json:"usd_from"`       // Lower bound (inclusive) of pricing tier in notional volume.
-	USDTo        *string `json:"usd_to"`         // Upper bound (exclusive) of pricing tier in notional volume.
-	TakerFeeRate *string `json:"taker_fee_rate"` // Taker fee rate, applied if the order takes liquidity.
-	MakerFeeRate *string `json:"maker_fee_rate"` // Maker fee rate, applied if the order creates liquidity.
-	AOPFrom      *string `json:"aop_from"`       // Lower bound (inclusive) of pricing tier in usd of total assets on platform.
-	AOPTO        *string `json:"aop_to"`         // Upper bound (exclusive) of pricing tier in usd of total assets on platform.
+	ProductType        *string             `url:"product_type,omitempty"`         // Only returns the orders matching this product type. By default, returns all product types.
+	ContractExpiryType *ContractExpiryType `url:"contract_expiry_type,omitempty"` // Only returns the orders matching this contract expiry type. Only applicable if product_type is set to FUTURE.
+	ProductVenue       *ProductVenue       `url:"product_venue,omitempty"`        // Venue for product.
 }
 
 type GetTransactionsSummaryResponse struct {
-	TotalVolume         float64 `json:"total_volume"` // Total volume across assets, denoted in USD.
-	TotalFees           float64 `json:"total_fees"`   // Total fees across assets, denoted in USD.
-	FeeTier             FeeTier `json:"fee_tier"`
-	GoodsAndServicesTax struct {
-		Rate *string `json:"rate"`
-		Type *string `json:"type"` // Possible values: [INCLUSIVE, EXCLUSIVE] // TODO: enum.
-	} `json:"goods_and_services_tax"`
-	AdvancedTradeOnlyVolume *float64 `json:"advanced_trade_only_volume"` // Advanced Trade volume (non-inclusive of Pro) across assets, denoted in USD.
-	AdvancedTradeOnlyFees   *float64 `json:"advanced_trade_only_fees"`   // Advanced Trade fees (non-inclusive of Pro) across assets, denoted in USD.
-	CoinbaseProVolume       *float64 `json:"coinbase_pro_volume"`        // Coinbase Pro volume across assets, denoted in USD.
-	CoinbaseProFees         *float64 `json:"coinbase_pro_fees"`          // Coinbase Pro fees across assets, denoted in USD.
+	TotalVolume             float64              `json:"total_volume"` // Total volume across assets, denoted in USD.
+	TotalFees               float64              `json:"total_fees"`   // Total fees across assets, denoted in USD.
+	FeeTier                 FeeTier              `json:"fee_tier"`
+	MarginRate              *MarginRate          `json:"margin_rate,omitempty"`
+	GoodsAndServicesTax     *GoodsAndServicesTax `json:"goods_and_services_tax,omitempty"`
+	AdvancedTradeOnlyVolume *float64             `json:"advanced_trade_only_volume,omitempty"` // Advanced Trade volume (non-inclusive of Pro) across assets, denoted in USD.
+	AdvancedTradeOnlyFees   *float64             `json:"advanced_trade_only_fees,omitempty"`   // Advanced Trade fees (non-inclusive of Pro) across assets, denoted in USD.
+	CoinbaseProVolume       *float64             `json:"coinbase_pro_volume,omitempty"`        // Coinbase Pro volume across assets, denoted in USD.
+	CoinbaseProFees         *float64             `json:"coinbase_pro_fees,omitempty"`          // Coinbase Pro fees across assets, denoted in USD.
+	TotalBalance            *string              `json:"total_balance,omitempty,omitempty"`    // Total balance across assets and products, which is comprised of the sum of spot, intx, and fcm, and denoted in USD.
 }
 
-// GetTransactionsSummary gets a summary of transactions with fee tiers, total volume, and fees.
-func (s *FeesService) GetTransactionsSummary(ctx context.Context, options *GetTransactionsSummaryOptions) (*GetTransactionsSummaryResponse, error) {
+//	Get a summary of transactions with fee tiers, total volume, and fees.
+//
+// https://docs.cdp.coinbase.com/coinbase-app/trade/reference/retailbrokerageapi_gettransactionsummary
+func (s *FeesService) GetTransactionsSummary(
+	ctx context.Context,
+	options *GetTransactionsSummaryOptions,
+) (*GetTransactionsSummaryResponse, error) {
+
+	u := s.client.baseURL + "/api/v3/brokerage/transaction_summary"
+
 	var summary GetTransactionsSummaryResponse
 
-	err := s.client.get(ctx, s.client.baseURL+"/api/v3/brokerage/transaction_summary", options, &summary)
+	err := s.client.get(ctx, u, options, &summary)
 	if err != nil {
 		err = fmt.Errorf("failed to fetch get transactions summary: %w", err)
 	}

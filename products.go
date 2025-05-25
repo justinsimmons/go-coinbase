@@ -11,14 +11,6 @@ import (
 	"time"
 )
 
-type ContractExpiryType string
-
-const (
-	ContractExpiryTypeUnknown   ContractExpiryType = "UNKNOWN_CONTRACT_EXPIRY_TYPE"
-	ContractExpiryTypeExpiring  ContractExpiryType = "EXPIRING"
-	ContractExpiryTypePerpetual ContractExpiryType = "PERPETUAL"
-)
-
 type ProductsService service
 
 type BidAsk struct {
@@ -32,13 +24,6 @@ type PriceBook struct {
 	Asks      []BidAsk   `json:"asks"`
 	Time      *time.Time `json:"time"`
 }
-
-type ProductType string
-
-const (
-	ProductTypeSpot ProductType = "SPOT"
-	Future          ProductType = "FUTURE"
-)
 
 type RiskManagedBy string
 

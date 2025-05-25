@@ -18,3 +18,7 @@ type ConvertsService service
 // DataApiService handles communication with the data API related
 // methods of the Coinbase Advanced Trade API.
 type DataApiService service
+
+// FeesService handles communication with the fees related methods of the
+// Coinbase Advanced Trade API.
+type FeesService service
