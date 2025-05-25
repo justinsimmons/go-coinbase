@@ -29,16 +29,17 @@ type Client struct {
 	baseURL    string       // Base URL of the Advanced Trade REST API.
 	httpClient *http.Client // Client used to make HTTP calls.
 
-	Accounts       *AccountsService       // Interface with the Advanced Trade REST API Accounts APIs.
+	Accounts       *AccountsService       // Advanced Trade REST API Accounts APIs.
+	Converts       *ConvertsService       // Advanced Trade REST API Converts APIs.
 	DataAPI        *DataApiService        // Advanced Trade REST API Data APIs.
-	Fees           *FeesService           // Interface with the Advanced Trade REST API Fees API.
-	Orders         *OrdersService         // Interface with the Advanced Trade REST API Orders APIs.
-	Products       *ProductsService       // Interface with the Advanced Trade REST API Products API.
-	Portfolio      *PortfoliosService     // Interface with the Advanced Trade REST API Portfolios API.
-	Futures        *FuturesService        // Interface with the Advanced Trade REST API Futures API.
-	Public         *PublicService         // Interface with the Advanced Trade REST API's Public API.
-	Converts       *ConvertsService       // Interface with the Advanced Trade REST API Converts API.
-	PaymentMethods *PaymentMethodsService // Interface with the Advanced Trade REST API's Payment Methods API.
+	Fees           *FeesService           // Advanced Trade REST API Fees API.
+	Futures        *FuturesService        // Advanced Trade REST API Futures API.
+	Orders         *OrdersService         // Advanced Trade REST API Orders APIs.
+	PaymentMethods *PaymentMethodsService // Advanced Trade REST API's Payment Methods API.
+	Perpertuals    *PerpetualsService     // Advanced Trade REST API's Perperuals API.
+	Portfolios     *PortfoliosService     // Advanced Trade REST API Portfolios API.
+	Products       *ProductsService       // Advanced Trade REST API Products API.
+	Public         *PublicService         // Advanced Trade REST API's Public API.
 }
 
 type service struct {
@@ -96,15 +97,16 @@ func NewClient(opts ...option) *Client {
 	commonService := service{client: &c}
 
 	c.Accounts = (*AccountsService)(&commonService)
+	c.Converts = (*ConvertsService)(&commonService)
 	c.DataAPI = (*DataApiService)(&commonService)
 	c.Fees = (*FeesService)(&commonService)
-	c.Products = (*ProductsService)(&commonService)
-	c.Orders = (*OrdersService)(&commonService)
-	c.Portfolio = (*PortfoliosService)(&commonService)
-	c.Converts = (*ConvertsService)(&commonService)
-	c.Public = (*PublicService)(&commonService)
-	c.PaymentMethods = (*PaymentMethodsService)(&commonService)
 	c.Futures = (*FuturesService)(&commonService)
+	c.Orders = (*OrdersService)(&commonService)
+	c.PaymentMethods = (*PaymentMethodsService)(&commonService)
+	c.Perpertuals = nil
+	c.Portfolios = (*PortfoliosService)(&commonService)
+	c.Products = (*ProductsService)(&commonService)
+	c.Public = (*PublicService)(&commonService)
 
 	for _, opt := range opts {
 		if opt != nil {

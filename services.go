@@ -44,3 +44,7 @@ type FeesService service
 // preferential treatment given to funds held in a regulated futures account,
 // pursuant to CFTC's regulations and the U.S. Bankruptcy Code.
 type FuturesService service
+
+// PerpetualsService handles communication with the perpetuals related methods
+// of the Coinbase Advanced Trade API.
+type PerpetualsServiceService service
