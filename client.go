@@ -30,6 +30,7 @@ type Client struct {
 	httpClient *http.Client // Client used to make HTTP calls.
 
 	Accounts       *AccountsService       // Interface with the Advanced Trade REST API Accounts APIs.
+	DataAPI        *DataApiService        // Advanced Trade REST API Data APIs.
 	Orders         *OrdersService         // Interface with the Advanced Trade REST API Orders APIs.
 	Products       *ProductsService       // Interface with the Advanced Trade REST API Products API.
 	Fees           *FeesService           // Interface with the Advanced Trade REST API Fees API.
@@ -95,6 +96,7 @@ func NewClient(opts ...option) *Client {
 	commonService := service{client: &c}
 
 	c.Accounts = (*AccountsService)(&commonService)
+	c.DataAPI = (*DataApiService)(&commonService)
 	c.Products = (*ProductsService)(&commonService)
 	c.Orders = (*OrdersService)(&commonService)
 	c.Portfolio = (*PortfoliosService)(&commonService)

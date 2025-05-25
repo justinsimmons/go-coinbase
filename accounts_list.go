@@ -23,7 +23,7 @@ type ListAccountsOptions struct {
 	// Only returns the accounts matching the portfolio ID. Only applicable
 	// for legacy keys. CDP keys will default to the key's permissioned
 	// portfolio.
-	RetailPortfolioID *string `json:"retail_portfolio_id"`
+	RetailPortfolioID *string `url:"retail_portfolio_id,omitempty"`
 }
 
 // Get a list of authenticated Advanced Trade accounts for the current user.
