@@ -12,28 +12,36 @@ import (
 	"fmt"
 )
 
-type listFuturesPositionsResponse struct {
-	Positions []FuturesPosition `json:"positions"`
+type getIntradayMarginSettingResponse struct {
+	Setting *IntradayMarginSetting `json:"setting,omitempty"`
 }
 
-// Get a list of positions in CFM products.
+// Get the futures intraday margin setting.
 //
-// https://docs.cdp.coinbase.com/coinbase-app/trade/reference/retailbrokerageapi_getfcmpositions
-func (s *FuturesService) ListPositions(
+// https://docs.cdp.coinbase.com/coinbase-app/trade/reference/retailbrokerageapi_getintradaymarginsetting
+func (s *FuturesService) GetIntradayMarginSetting(
 	ctx context.Context,
-) ([]FuturesPosition, error) {
+) (IntradayMarginSetting, error) {
 
-	u := s.client.baseURL + "/api/v3/brokerage/cfm/positions"
+	u := s.client.baseURL + "/api/v3/brokerage/cfm/intraday/margin_setting"
 
-	var resp listFuturesPositionsResponse
+	var resp getIntradayMarginSettingResponse
 
 	err := s.client.get(ctx, u, nil, &resp)
 	if err != nil {
-		return nil, fmt.Errorf(
-			"failed to get list of futures positions: %w",
+		return IntradayMarginSettingUnspecified, fmt.Errorf(
+			"failed to get intraday margin setting: %w",
 			err,
 		)
 	}
 
-	return resp.Positions, nil
+	// Should never happen but prevents a null pointer deref on an API error.
+	if resp.Setting == nil {
+		return IntradayMarginSettingUnspecified, fmt.Errorf(
+			"coinbase API response successful, but missing intraday margin " +
+				"setting",
+		)
+	}
+
+	return *resp.Setting, nil
 }

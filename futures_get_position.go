@@ -16,11 +16,24 @@ type getFuturesPosition struct {
 	Position *FuturesPosition `json:"position"`
 }
 
-// GetPosition gets the position of a specific CFM futures product.
-func (s *FuturesService) GetPosition(ctx context.Context, id string) (*FuturesPosition, error) {
+// Get positions for a specific CFM product.
+// The product id will be a ticker symbol (e.g. 'BIT-28JUL23-CDE').
+//
+// https://docs.cdp.coinbase.com/coinbase-app/trade/reference/retailbrokerageapi_getfcmposition
+func (s *FuturesService) GetPosition(
+	ctx context.Context,
+	productID string,
+) (*FuturesPosition, error) {
+
+	u := fmt.Sprintf(
+		"%s/api/v3/brokerage/cfm/positions/%s",
+		s.client.baseURL,
+		productID,
+	)
+
 	var resp getFuturesPosition
 
-	err := s.client.get(ctx, fmt.Sprintf("%s/api/v3/brokerage/cfm/positions/%s", s.client.baseURL, id), nil, &resp)
+	err := s.client.get(ctx, u, nil, &resp)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get futures position: %w", err)
 	}

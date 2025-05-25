@@ -34,8 +34,3 @@ type Portfolio struct {
 	Type    *PortfolioType `json:"type"`
 	Deleted *bool          `json:"deleted"`
 }
-
-type Funds struct {
-	Value    string `json:"value"`    // These two values fully represent the monetary amount. Non-localized amount in decimal notation (e.g. "1.234").
-	Currency string `json:"currency"` // Currency symbol (USD, BTC, etc). Not an asset UUID.
-}

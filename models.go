@@ -15,7 +15,7 @@ import (
 
 // Type of coinbase account.
 //
-//go:generate enumer -type=AccountType -transform=snake-upper -json -txt
+//go:generate enumer -type=AccountType -transform=snake-upper -json -text
 type AccountType byte
 
 const (
@@ -28,7 +28,7 @@ const (
 
 // Coinbase platform the account is on.
 //
-//go:generate enumer -type=AccountPlatform -transform=snake-upper -json -txt
+//go:generate enumer -type=AccountPlatform -transform=snake-upper -json -text
 type AccountPlatform byte
 
 const (
@@ -102,7 +102,7 @@ type TradeIncentiveMetadata struct {
 
 // Status of a trade.
 //
-//go:generate enumer -type=AccountPlatform -transform=snake-upper -json -txt
+//go:generate enumer -type=AccountPlatform -transform=snake-upper -json -text
 type TradeStatus byte
 
 const (
@@ -134,7 +134,7 @@ type Disclosure struct {
 
 // Source of a waived free.
 //
-//go:generate enumer -type=WaivedFeeSource -transform=snake-upper -json -txt
+//go:generate enumer -type=WaivedFeeSource -transform=snake-upper -json -text
 type WaivedFeeSource byte
 
 const (
@@ -248,4 +248,129 @@ type GoodsAndServicesTax struct {
 // Margin rate.
 type MarginRate struct {
 	Value *string `json:"value,omitempty"` // String representation allows for unlimited precision.
+}
+
+// Margin profile type.
+//
+//go:generate enumer -type=AccountType -transform=snake-upper -json -text
+type MarginProfileType byte
+
+const (
+	MarginProfileTypeUnspecified MarginProfileType = iota
+	MarginProfileTypeRetailRegular
+	MarginProfileTypeRetailIntradayMargin1 // TODO: Will this be Margin1 or Margin_1
+)
+
+// Margin window type.
+//
+//go:generate enumer -type=MarginWindowType -transform=snake-upper -json -text
+type MarginWindowType byte
+
+const (
+	MarginWindowTypeUnspecified MarginWindowType = iota
+	MarginWindowTypeOvernight
+	MarginWindowTypeWeekend
+	MarginWindowTypeIntraday
+	MarginWindowTypeTransition
+)
+
+type MarginWindow struct {
+	Type    *MarginWindowType `json:"margin_window_type,omitempty"` // Your margin window.
+	EndTime *time.Time        `json:"end_time,omitempty"`           // The end time of the margin window.
+}
+
+// Margin level types.
+//
+//go:generate enumer -type=MarginLevelType -transform=snake-upper -json -text
+type MarginLevelType byte
+
+const (
+	MarginLevelTypeUnspecified MarginLevelType = iota
+	MarginLevelTypeBase
+	MarginLevelTypeWarning
+	MarginLevelTypeDanger
+	MarginLevelTypeLiquidation
+)
+
+// Margin window measure.
+type MarginWindowMeasure struct {
+	MarginWindowType   *MarginWindowType `json:"margin_window_type,omitempty"` // Your margin window.
+	MarginLevel        *MarginLevelType  `json:"margin_level,omitempty"`       // Margin level for liquidation purposes.
+	InitialMargin      *string           `json:"initial_margin,omitempty"`
+	MaintenanceMargin  *string           `json:"maintenance_margin,omitempty"`
+	LiquidationBuffer  *string           `json:"liquidation_buffer,omitempty"`
+	TotalHold          *string           `json:"total_hold,omitempty"`
+	FuturesBuyingPower *string           `json:"futures_buying_power,omitempty"` // The amount of your cash balance that is available to trade CFM futures.
+}
+
+// Balance summary.
+type BalanceSummary struct {
+	FuturesBuyingPower           *AvailableBalance    `json:"futures_buying_power,omitempty"`          // The amount of your cash balance that is available to trade CFM futures.
+	TotalUsdBalance              *AvailableBalance    `json:"total_usd_balance,omitempty"`             // Aggregate USD maintained across your CFTC-regulated futures account and your Coinbase Inc. spot account.
+	CbiUsdBalance                *AvailableBalance    `json:"cbi_usd_balance,omitempty"`               // USD maintained in your Coinbase Inc. spot account.
+	CfmUsdBalance                *AvailableBalance    `json:"cfm_usd_balance,omitempty"`               // USD maintained in your CFTC-regulated futures account. Funds held in your futures account are not available to trade spot.
+	TotalOpenOrdersHoldAmmount   *AvailableBalance    `json:"total_open_orders_hold_amount,omitempty"` // Your total balance on hold for spot and futures open orders.
+	UnrealizedPNL                *AvailableBalance    `json:"unrealized_pnl,omitempty"`                // Your current unrealized PnL across all open positions.
+	DailyRealizedPNL             *AvailableBalance    `json:"daily_realized_pnl,omitempty"`            // Your realized PnL from the current trade date. May include profit or loss from positions you’ve closed on the current trade date.
+	InitialMargin                *AvailableBalance    `json:"initial_margin,omitempty"`                // Margin required to initiate futures positions. Once futures orders are placed, these funds cannot be used to trade spot. The actual amount of funds necessary to support executed futures orders will be moved to your futures account.
+	AvailableMargin              *AvailableBalance    `json:"available_margin,omitempty"`              // Funds available to meet your anticipated margin requirement. This includes your CBI spot USD, CFM futures USD, and Futures PnL, less any holds for open spot or futures orders.
+	LiquidationThreshold         *AvailableBalance    `json:"liquidation_threshold,omitempty"`         // When your available funds for collateral drop to the liquidation threshold, some or all of your futures positions will be liquidated.
+	LiquidationBufferAmount      *AvailableBalance    `json:"liquidation_buffer_amount,omitempty"`     // Funds available in excess of the liquidation threshold, calculated as available margin minus liquidation threshold. If your liquidation buffer amount reaches 0, your futures positions and/or open orders will be liquidated as necessary.
+	LiquidationBufferPercentage  *string              `json:"liquidation_buffer_percentage,omitempty"` // Funds available in excess of the liquidation threshold expressed as a percentage. If your liquidation buffer percentage reaches 0%, your futures positions and/or open orders will be liquidated as necessary.
+	IntradayMarginWindowMeasure  *MarginWindowMeasure `json:"intraday_margin_window_measure,omitempty"`
+	OvernightMarginWindowMeasure *MarginWindowMeasure `json:"overnight_margin_window_measure,omitempty"`
+}
+
+// The side of a futures trading position.
+//
+//go:generate enumer -type=FuturesSide -transform=snake-upper -trimprefix=FuturesSide -json -text
+type FuturesSide byte
+
+const (
+	FuturesSideUnknown FuturesSide = iota
+	FuturesSideLong
+	FuturesSideShort
+)
+
+// Futures trading position.
+type FuturesPosition struct {
+	ProductID         *string      `json:"product_id,omitempty"`          // The ticker symbol (e.g. 'BIT-28JUL23-CDE').
+	ExpirationTime    *time.Time   `json:"expiration_time,omitempty"`     // The expiry of your position.
+	Side              *FuturesSide `json:"side,omitempty"`                // The side of your position.
+	NumberOfContracts *string      `json:"number_of_contracts,omitempty"` // The size of your position in contracts.
+	CurrentPrice      *string      `json:"current_price,omitempty"`       // The current price of the product.
+	AverageEntryPrice *string      `json:"avg_entry_price,omitempty"`     // The average entry price at which you entered your current position.
+	UnrealizedPNL     *string      `json:"unrealized_pnl,omitempty"`      // Your current unrealized PnL for your position.
+	DailyRealizedPNL  *string      `json:"daily_realized_pnl,omitempty"`  // Your realized PnL from your trades in this product on current trade date.
+}
+
+// Intraday margin setting.
+//
+//go:generate enumer -type=IntradayMarginSetting -transform=snake-upper -json -text
+type IntradayMarginSetting byte
+
+const (
+	IntradayMarginSettingUnspecified IntradayMarginSetting = iota
+	IntradayMarginSettingStandard
+	IntradayMarginSettingIntraday
+)
+
+// Futures sweep status.
+//
+//go:generate enumer -type=SweepStatus -transform=snake-upper -trimprefix=SweepStatus -json -text
+type SweepStatus byte
+
+const (
+	SweepStatusUnknownFcmSweepStatus SweepStatus = iota
+	SweepStatusPending
+	SweepStatusProcessing
+)
+
+// Futures sweep.
+type FuturesSweep struct {
+	ID              *string           `json:"id,omitempty"`               // The ID of the sweep request scheduled.
+	RequestedAmount *AvailableBalance `json:"requested_amount,omitempty"` //The requested sweep amount.
+	ShouldSweepAll  bool              `json:"should_sweep_all,omitempty"` // True if the request was to sweep all available funds from your CFM futures account.
+	Status          *SweepStatus      `json:"status,omitempty"`           // A pending sweep is a sweep that has not started processing and can be cancelled. A processing sweep is a sweep that is currently being processed and cannot be cancelled.
+	ScheduledTime   *time.Time        `json:"scheduled_time,omitempty"`   // The timestamp at which the sweep request was submitted.
 }

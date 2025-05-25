@@ -22,3 +22,25 @@ type DataApiService service
 // FeesService handles communication with the fees related methods of the
 // Coinbase Advanced Trade API.
 type FeesService service
+
+// FuturesService handles communication with the futures related methods of the
+// Coinbase Advanced Trade API.
+// Futures vs Spot Accounts
+//
+//	Futures and spot balances are held in different accounts. Cash is always
+//
+// deposited into your Coinbase Inc. (CBI) spot account. You can only acquire
+// spot assets with funds in your spot account.
+//
+// Treatment of Cash
+//
+//	Cash is automatically transferred to your Coinbase Financial Markets (CFM)
+//
+// futures account to satisfy margin requirements. Automatic transfers are
+// only from CBI spot accounts to CFM futures accounts. You can transfer cash
+// that isn't being used to margin or maintain futures positions into your
+// CBI spot account (to trade spot assets or to withdraw) with Schedule
+// Futures Sweep. Funds held in a CBI spot account do not receive the
+// preferential treatment given to funds held in a regulated futures account,
+// pursuant to CFTC's regulations and the U.S. Bankruptcy Code.
+type FuturesService service

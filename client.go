@@ -31,9 +31,9 @@ type Client struct {
 
 	Accounts       *AccountsService       // Interface with the Advanced Trade REST API Accounts APIs.
 	DataAPI        *DataApiService        // Advanced Trade REST API Data APIs.
+	Fees           *FeesService           // Interface with the Advanced Trade REST API Fees API.
 	Orders         *OrdersService         // Interface with the Advanced Trade REST API Orders APIs.
 	Products       *ProductsService       // Interface with the Advanced Trade REST API Products API.
-	Fees           *FeesService           // Interface with the Advanced Trade REST API Fees API.
 	Portfolio      *PortfoliosService     // Interface with the Advanced Trade REST API Portfolios API.
 	Futures        *FuturesService        // Interface with the Advanced Trade REST API Futures API.
 	Public         *PublicService         // Interface with the Advanced Trade REST API's Public API.
@@ -97,10 +97,10 @@ func NewClient(opts ...option) *Client {
 
 	c.Accounts = (*AccountsService)(&commonService)
 	c.DataAPI = (*DataApiService)(&commonService)
+	c.Fees = (*FeesService)(&commonService)
 	c.Products = (*ProductsService)(&commonService)
 	c.Orders = (*OrdersService)(&commonService)
 	c.Portfolio = (*PortfoliosService)(&commonService)
-	c.Fees = (*FeesService)(&commonService)
 	c.Converts = (*ConvertsService)(&commonService)
 	c.Public = (*PublicService)(&commonService)
 	c.PaymentMethods = (*PaymentMethodsService)(&commonService)

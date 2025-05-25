@@ -85,7 +85,12 @@ func (c *Client) do(r *http.Request, successCode int, v any) error {
 
 	err = json.Unmarshal(buf, v)
 	if err != nil {
-		return fmt.Errorf("failed to unmarshal HTTP response '%s' into '%T': %w", buf, v, err)
+		return fmt.Errorf(
+			"failed to unmarshal HTTP response '%s' into '%T': %w",
+			buf,
+			v,
+			err,
+		)
 	}
 
 	return nil

@@ -17,10 +17,14 @@ type cancelPendingFuturesSweepResponse struct {
 	Success bool `json:"success"`
 }
 
-// CancelPendingSweep cancels your pending sweep of funds from your CFTC-regulated futures account to your Coinbase Inc. USD Spot wallet.
+// Cancel the pending sweep of funds from FCM wallet to USD Spot wallet
 // Returns true if all sweeps are successfully canceled.
+//
+// https://docs.cdp.coinbase.com/coinbase-app/trade/reference/retailbrokerageapi_cancelfcmsweep
 func (s *FuturesService) CancelPendingSweep(ctx context.Context) (bool, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, s.client.baseURL+"/api/v3/brokerage/cfm/sweeps", nil)
+	u := s.client.baseURL + "/api/v3/brokerage/cfm/sweeps"
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u, nil)
 	if err != nil {
 		return false, fmt.Errorf("failed to create HTTP request: %w", err)
 	}
@@ -28,7 +32,10 @@ func (s *FuturesService) CancelPendingSweep(ctx context.Context) (bool, error) {
 	var resp cancelPendingFuturesSweepResponse
 	err = s.client.doWithAuthentication(req, http.StatusOK, &resp)
 	if err != nil {
-		return false, fmt.Errorf("failed to cancel pending futures sweep: %w", err)
+		return false, fmt.Errorf(
+			"failed to cancel pending futures sweep: %w",
+			err,
+		)
 	}
 
 	return resp.Success, nil
