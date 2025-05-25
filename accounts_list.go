@@ -14,31 +14,36 @@ import (
 
 type ListAccountsResponse struct {
 	Accounts []Account `json:"accounts"`
-	// Whether there are additional pages for this query.
-	HasNext bool `json:"has_next"`
-	// Cursor for paginating. Users can use this string to pass in the next call to this
-	// endpoint, and repeat this process to fetch all accounts through pagination.
-	Cursor *string `json:"cursor"`
-	// Number of accounts returned
-	Size *int32 `json:"size"`
+	PaginatedResponse
 }
 
-type AccountListOptions struct {
-	// A pagination limit with default of 49 and maximum of 250.
-	// If has_next is true, additional orders are available to be fetched with pagination and the cursor value
-	// in the response can be passed as cursor parameter in the subsequent request.
-	Limit *int32 `url:"limit,omitempty"`
-	// Cursor used for pagination. When provided, the response returns responses after this cursor.
-	Cursor *string `url:"cursor,omitempty"`
+type ListAccountsOptions struct {
+	PaginationOptions // Options to control API response pagination.
+	// Deprecated.
+	// Only returns the accounts matching the portfolio ID. Only applicable
+	// for legacy keys. CDP keys will default to the key's permissioned
+	// portfolio.
+	RetailPortfolioID *string `json:"retail_portfolio_id"`
 }
 
-// List retrieves a list of authenticated accounts for the current user.
-// https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getaccounts
-func (s *AccountService) List(ctx context.Context, options *AccountListOptions) (*ListAccountsResponse, error) {
+// Get a list of authenticated Advanced Trade accounts for the current user.
+//
+// https://docs.cdp.coinbase.com/coinbase-app/trade/reference/retailbrokerageapi_getaccounts
+func (s *AccountService) List(
+	ctx context.Context,
+	options *ListAccountsOptions,
+) (*ListAccountsResponse, error) {
+
+	u := s.client.baseURL + "/api/v3/brokerage/accounts"
+
 	var accountsResp ListAccountsResponse
-	err := s.client.get(ctx, s.client.baseURL+"/api/v3/brokerage/accounts", options, &accountsResp)
+	err := s.client.get(ctx, u, options, &accountsResp)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch list of authenticated accounts for the current user: %w", err)
+		return nil, fmt.Errorf(
+			"failed to fetch list of authenticated accounts for the current "+
+				"user: %w",
+			err,
+		)
 	}
 
 	return &accountsResp, err

@@ -16,12 +16,20 @@ type getAccountResponse struct {
 	Account Account `json:"account"`
 }
 
-// Get retrieves a list of information about an account, given an account UUID.
+// Get a list of information about an account, given an account UUID.
+//
+// https://docs.cdp.coinbase.com/coinbase-app/trade/reference/retailbrokerageapi_getaccount
 func (s *AccountService) Get(ctx context.Context, id string) (*Account, error) {
+	u := fmt.Sprintf("%s/api/v3/brokerage/accounts/%s", s.client.baseURL, id)
+
 	var accountResp getAccountResponse
-	err := s.client.get(ctx, fmt.Sprintf("%s/api/v3/brokerage/accounts/%s", s.client.baseURL, id), nil, &accountResp)
+	err := s.client.get(ctx, u, nil, &accountResp)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch account '%s' for the current user: %w", id, err)
+		return nil, fmt.Errorf(
+			"failed to fetch account '%s' for the current user: %w",
+			id,
+			err,
+		)
 	}
 
 	return &accountResp.Account, nil
