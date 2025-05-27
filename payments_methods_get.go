@@ -18,14 +18,27 @@ type getPaymentMethodResponse struct {
 }
 
 // Get information about a payment method for the current user.
-// https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getpaymentmethod/
-func (s *PaymentMethodsService) Get(ctx context.Context, id string) (*PaymentMethod, error) {
-	u := fmt.Sprintf("%s/api/v3/brokerage/payment_methods/%s", s.client.baseURL, id)
+//
+// https://docs.cdp.coinbase.com/coinbase-app/trade/reference/retailbrokerageapi_getpaymentmethod
+func (s *PaymentMethodsService) Get(
+	ctx context.Context,
+	paymentMethodID string,
+) (*PaymentMethod, error) {
+
+	u := fmt.Sprintf(
+		"%s/api/v3/brokerage/payment_methods/%s",
+		s.client.baseURL,
+		paymentMethodID,
+	)
 
 	var resp getPaymentMethodResponse
 	err := s.client.get(ctx, u, nil, &resp)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch payment method '%s' for the current user: %w", id, err)
+		return nil, fmt.Errorf(
+			"failed to fetch payment method '%s' for the current user: %w",
+			paymentMethodID,
+			err,
+		)
 	}
 
 	return &resp.PaymentMethod, nil

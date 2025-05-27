@@ -52,3 +52,7 @@ type OrdersService service
 // PerpetualsService handles communication with the perpetuals related methods
 // of the Coinbase Advanced Trade API.
 type PerpetualsServiceService service
+
+// PaymentMethodsService handles communication with the payment method related
+// methods of the Coinbase Advanced Trade API.
+type PaymentMethodsService service

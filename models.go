@@ -773,3 +773,198 @@ type EditOrderError struct {
 	EditFailureReason    *EditFailureReason    `json:"edit_failure_reason,omitempty"`
 	PreviewFailureReason *PreviewFailureReason `json:"preview_failure_reason,omitempty"`
 }
+
+// Status of a Coinbase Order.
+//
+//go:generate enumer -type=OrderStatus -transform=snake-upper -trimprefix=OrderStatus -json -text
+type OrderStatus byte
+
+const (
+	OrderStatusUnknownOrderStatus OrderStatus = iota
+	OrderStatusOpen
+	OrderStatusFilled
+	OrderStatusCancelled
+	OrderStatusExpired
+	OrderStatusFailed
+	OrderStatusQueued
+	OrderStatusCancelQueued
+)
+
+// The client specified window for which the order can remain active.
+//
+//go:generate enumer -type=TimeInForce -transform=snake-upper -trimprefix=TimeInForce -json -text
+type TimeInForce byte
+
+const (
+	TimeInForceUnknownTimeInForce TimeInForce = iota // Unknown or unspecified.
+	TimeInForceGoodUntilDate                         // Orders are valid till a specified date or time.
+	TimeInForceGoodUntilCancelled                    //  orders remain open on the book until canceled.
+	TimeInForceImmediateOrCancel                     // orders instantly cancel the remaining size of the limit order instead of opening it on the book.
+	TimeInForceFillOrKill
+)
+
+// The trigger status of an order, with respect to stop price.
+//
+//go:generate enumer -type=TriggerStatus -transform=snake-upper -trimprefix=TriggerStatus -json -text
+type TriggerStatus byte
+
+const (
+	TriggerStatusUnknownTriggerStatus TriggerStatus = iota
+	TriggerStatusInvalidOrderType
+	TriggerStatusStopPending
+	TriggerStatusStopTriggered
+)
+
+// Type of Coinbase order.
+//
+//go:generate enumer -type=OrderType -transform=snake-upper -trimprefix=OrderType -json -text
+type OrderType byte
+
+const (
+	OrderTypeUnknownOrderType OrderType = iota
+	OrderTypeMarket
+	OrderTypeLimt
+	OrderTypeStop
+	OrderTypeStopLimit
+	OrderTypeBracket
+	OrderTypeTwap
+)
+
+// Reason an order was rejected.
+//
+//go:generate enumer -type=OrderRejectReason -transform=snake-upper -trimprefix=OrderRejectReason -json -text
+type OrderRejectReason byte
+
+const (
+	OrderRejectReasonRejectReasonUnknown OrderRejectReason = iota
+	OrderRejectReasonHoldFailure
+	OrderRejectReasonTooManyOpenOrders
+	OrderRejectReasonRejectReasonInsufficientFunds
+	OrderRejectReasonRateLimitExceeded
+)
+
+// Source an order was placed from.
+//
+//go:generate enumer -type=OrderPlacementSource -transform=snake-upper -trimprefix=OrderPlacementSource -json -text
+type OrderPlacementSource byte
+
+const (
+	OrderPlacementSourceUnknownPlacementSource OrderPlacementSource = iota
+	OrderPlacementSourceRetailSimple
+	OrderPlacementSourceRetailAdvanced
+)
+
+type OrderEditHisory struct {
+	Price                  *string    `json:"price,omitempty"` // The update price of the order.
+	Size                   *string    `json:"size,omitempty"`  // The updated size of the order.
+	ReplaceAcceptTimestamp *time.Time `json:"replace_accept_timestamp,omitempty"`
+}
+
+// Coinbase Order.
+type Order struct {
+	ID                         string                `json:"order_id"`                               // The unique id for this order.
+	ProductID                  string                `json:"product_id"`                             // The product this order was created for e.g. 'BTC-USD'.
+	UserID                     string                `json:"user_id"`                                // The id of the User owning this Order.
+	Configuration              OrderConfiguration    `json:"order_configuration"`                    // Configuration of the order.
+	Side                       Side                  `json:"side"`                                   // The side of the market that the order is on (e.g. 'BUY', 'SELL').
+	ClientOrderID              string                `json:"client_order_id"`                        // The unique ID provided for the order (used for identification purposes).
+	Status                     OrderStatus           `json:"status"`                                 // The current state of the order.
+	TimeInForce                *TimeInForce          `json:"time_in_force,omitempty"`                // The client specified window for which the order can remain active.
+	CreatedTime                time.Time             `json:"created_time"`                           // Timestamp for when the order was created.
+	CompletionPercentage       string                `json:"completion_percentage"`                  // The percent of total order amount that has been filled.
+	FilledSize                 *string               `json:"filled_size,omitempty"`                  // The portion (in base currency) of total order amount that has been filled.
+	AverageFilledPrice         string                `json:"average_filled_price"`                   // The average of all prices of fills for this order.
+	Fee                        *string               `json:"fee,omitempty"`                          // **(Deprecated)** Commission amount.
+	NumberOfFills              string                `json:"number_of_fills"`                        // Number of fills that have been posted for this order.
+	FilledValue                *string               `json:"filled_value,omitempty"`                 // The amount -- in quote currency -- of the total order that has been filled.
+	PendingCancel              bool                  `json:"pending_cancel"`                         // Whether a cancel request has been initiated for the order, and not yet completed.
+	SizeInQuote                bool                  `json:"size_in_quote"`                          // Whether the order was placed with quote currency.
+	TotalFees                  string                `json:"total_fees"`                             // The total fees for the order.
+	SizeInclusiveOfFees        bool                  `json:"size_inclusive_of_fees"`                 // Whether the order size includes fees.
+	TotalValueAfterFees        string                `json:"total_value_after_fees"`                 // Derived field defined as (filled_value + total_fees) for buy orders and (filled_value - total_fees) for sell orders.
+	TriggerStatus              *TriggerStatus        `json:"trigger_status,omitempty"`               // The trigger status of the order, with respect to stop price.
+	Type                       *OrderType            `json:"order_type,omitempty"`                   // Type of the order.
+	RejectReason               *OrderRejectReason    `json:"reject_reason,omitempty"`                // Rejection Reason.
+	Settled                    *bool                 `json:"settled,omitempty"`                      // True if the order is fully filled, false otherwise.
+	ProductType                *ProductType          `json:"product_type,omitempty"`                 // The type of order, i.e. Spot or Future
+	RejectMessage              *string               `json:"reject_message,omitempty"`               // Message stating why the order was rejected.
+	CancelMessage              *string               `json:"cancel_message,omitempty"`               // Message stating why the order was canceled.
+	OrderPlacementSource       *OrderPlacementSource `json:"order_placement_source,omitempty"`       // Message stating which source an order was placed from.
+	OutstandingHoldAmount      *string               `json:"outstanding_hold_amount,omitempty"`      // The remaining hold amount calculated as (holdAmount - holdAmountReleased). If the hold is released, returns 0.
+	IsLiquidation              *bool                 `json:"is_liquidation,omitempty"`               // True if order is of liquidation type.
+	LastFillTime               *time.Time            `json:"last_fill_time,omitempty"`               // Time of the most recent fill for this order.
+	EditHistory                []OrderEditHisory     `json:"edit_history,omitempty"`                 // An array of the latest 5 edits per order.
+	Leverage                   *string               `json:"leverage,omitempty"`                     // The amount of leverage for the order (default is 1.0).
+	MarginType                 *MarginType           `json:"margin_type,omitempty"`                  // Margin Type for this order (default is CROSS).
+	RetailPortfolioID          *string               `json:"retail_portfolio_id,omitempty"`          // The ID of the portfolio this order is associated with.
+	OriginatingOrderID         *string               `json:"originating_order_id,omitempty"`         // The ID of the parent order of an attached order.
+	AttachedORderID            *string               `json:"attached_order_id,omitempty"`            // The ID of the attached order of a parent order.
+	AttachedOrderConfiguration *OrderConfiguration   `json:"attached_order_configuration,omitempty"` // The configuration of the attached order. Only TriggerBracketGtc is eligible. Size field must be omitted as the size of the attached order is the same as that of the originating or parent order.
+}
+
+// String denoting what type of fill this is.
+//
+//go:generate enumer -type=FillType -transform=snake-upper -trimprefix=FillType -json -text
+type FillType byte
+
+const (
+	TradeTypeFill FillType = iota
+	TradeTypeReversal
+	TradeTypeCorrection
+	TradeTypeSynthetic
+)
+
+//go:generate enumer -type=LiquidityIndicator -transform=snake-upper -trimprefix=LiquidityIndicator -json -text
+type LiquidityIndicator byte
+
+const (
+	LiquidityIndicatorUnknownLiquidityIndicator LiquidityIndicator = iota
+	LiquidityIndicatorMaker
+	LiquidityIndicatorTaker
+)
+
+// Fill.
+type Fill struct {
+	EntryID            *string             `json:"entry_id,omitempty"`            // Unique identifier for the fill.
+	TradeID            *string             `json:"trade_id,omitempty"`            // ID of the fill -- unique for all `FILL` trade_types but not unique for adjusted fills.
+	OrderID            *string             `json:"order_id,omitempty"`            // ID of the order the fill belongs to.
+	TradeTime          *time.Time          `json:"trade_time,omitempty"`          // Time at which this fill was completed.
+	TradeType          *FillType           `json:"trade_type,omitempty"`          // String denoting what type of fill this is. Regular fills have the value `FILL`. Adjusted fills have possible values `REVERSAL`, `CORRECTION`, `SYNTHETIC`.
+	Price              *string             `json:"price,omitempty"`               // Price the fill was posted at.
+	Size               *string             `json:"size,omitempty"`                // Amount of order that was transacted at this fill.
+	Commission         *string             `json:"commission,omitempty"`          // Fee amount for fill.
+	ProductID          *string             `json:"product_id,omitempty"`          // The trading pair (e.g. 'BTC-USD').
+	SequenceTimestamp  *time.Time          `json:"sequence_timestamp,omitempty"`  // Time at which this fill was posted.
+	LiquidityIndicator *LiquidityIndicator `json:"liquidity_indicator,omitempty"` // Whether this fill gives or takes liquidity.
+	SizeInQuote        *bool               `json:"size_in_quote,omitempty"`       // Whether the order was placed with quote currency.
+	UserID             *string             `json:"user_id,omitempty"`             // User that placed the order the fill belongs to.
+	Side               *Side               `json:"side,omitempty"`                // Side of order that this fill belongs to.
+	RetailPortfolioID  *string             `json:"retail_portfolio_id,omitempty"` // Portfolio that the order fill belongs to.
+}
+
+// PNL configuration for a bracket order.
+type TriggerBracketPNL struct {
+	TakeProfitPNL *string `json:"take_profit_pnl,omitempty"` // PNL if an attached order fills at the take profit price.
+	StopLossPNL   *string `json:"stop_loss_pnl,omitempty"`   // PNL if an attached order fills at the stop loss price.
+}
+
+// Expected PNL of an order. This value is an estimate and does not take into
+// account fees and slippage.
+type PnlConfiguration struct {
+	TriggerBracketPNL *TriggerBracketPNL `json:"trigger_bracket_pnl,omitempty"` // PNL configuration for a bracket order.
+}
+
+// Coinbase Payment method.
+type PaymentMethod struct {
+	ID            *string    `json:"id,omitempty"`             // Unique identifier for the payment method.
+	Type          *string    `json:"type,omitempty"`           // The payment method type.
+	Name          *string    `json:"name,omitempty"`           // Name for the payment method.
+	Currency      *string    `json:"currency,omitempty"`       // Currency symbol for the payment method.
+	Verified      *bool      `json:"verified,omitempty"`       // The verified status of the payment method.
+	AllowBuy      *bool      `json:"allow_buy,omitempty"`      // Whether or not this payment method can perform buys.
+	AllowSell     *bool      `json:"allow_sell,omitempty"`     // Whether or not this payment method can perform sells.
+	AllowDeposit  *bool      `json:"allow_deposit,omitempty"`  // Whether or not this payment method can perform deposits.
+	AllowWithdraw *bool      `json:"allow_withdraw,omitempty"` // Whether or not this payment method can perform withdrawals.
+	CreatedAt     *time.Time `json:"created_at,omitempty"`     // Time at which this payment method was created.
+	UpdatedAt     *time.Time `json:"updated_at,omitempty"`     // Time at which this payment method was updated.
+}
