@@ -45,6 +45,10 @@ type FeesService service
 // pursuant to CFTC's regulations and the U.S. Bankruptcy Code.
 type FuturesService service
 
+// OrdersService handles communication with the orders related methods
+// of the Coinbase Advanced Trade API.
+type OrdersService service
+
 // PerpetualsService handles communication with the perpetuals related methods
 // of the Coinbase Advanced Trade API.
 type PerpetualsServiceService service

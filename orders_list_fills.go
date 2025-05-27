@@ -13,47 +13,16 @@ import (
 	"time"
 )
 
-type TradeType string
-
-const (
-	TradeTypeFill       TradeType = "FILL"
-	TradeTypeReversal   TradeType = "REVERSAL"
-	TradeTypeCorrection TradeType = "CORRECTION"
-	TradeTypeSynthetic  TradeType = "SYNTHETIC"
-)
-
-type LiquidityIndicator string
-
-const (
-	LiquidityIndicatorUnknown LiquidityIndicator = "UNKNOWN_LIQUIDITY_INDICATOR"
-	LiquidityIndicatorMaker   LiquidityIndicator = "MAKER"
-	LiquidityIndicatorTaker   LiquidityIndicator = "TAKER"
-)
-
 type ListOrderFillsOptions struct {
-	OrderID           *string    `url:"order_id,omitempty"`                 // ID of order.
-	ProductID         *string    `url:"product_id,omitempty"`               // The ID of the product this order was created for.
-	StartSequenceTime *time.Time `url:"start_sequence_timestamp,omitempty"` // Start date. Only fills with a trade time at or after this start date are returned.
-	EndSequenceTime   *time.Time `url:"end_sequence_timestamp,omitempty"`   // End date. Only fills with a trade time before this start date are returned.
-	Limit             *int64     `url:"limit,omitempty"`                    // Maximum number of fills to return in response. Defaults to 100.
-	Cursor            *string    `url:"cursor,omitempty"`                   // Cursor used for pagination. When provided, the response returns responses after this cursor.
-}
-
-type Fill struct {
-	EntryID            *string             `json:"entry_id"`            // Unique identifier for the fill.
-	TradeID            *string             `json:"trade_id"`            // ID of the fill -- unique for all `FILL` trade_types but not unique for adjusted fills.
-	OrderID            *string             `json:"order_id"`            // ID of the order the fill belongs to.
-	TradeTime          *time.Time          `json:"trade_time"`          // Time at which this fill was completed.
-	TradeType          *TradeType          `json:"trade_type"`          // String denoting what type of fill this is. Regular fills have the value `FILL`. Adjusted fills have possible values `REVERSAL`, `CORRECTION`, `SYNTHETIC`.
-	Price              *string             `json:"price"`               // Price the fill was posted at.
-	Size               *string             `json:"size"`                // Amount of order that was transacted at this fill.
-	Commission         *string             `json:"commission"`          //  Fee amount for fill.
-	ProductID          *string             `json:"product_id"`          // The product this order was created for.
-	SequenceTimestamp  *time.Time          `json:"sequence_timestamp"`  // Time at which this fill was posted.
-	LiquidityIndicator *LiquidityIndicator `json:"liquidity_indicator"` // Possible values: [UNKNOWN_LIQUIDITY_INDICATOR, MAKER, TAKER]
-	SizeInQuote        *bool               `json:"size_in_quote"`       // Whether the order was placed with quote currency.
-	UserID             *string             `json:"user_id"`             // User that placed the order the fill belongs to.
-	Side               *Side               `json:""`                    // Side the fill is on [BUY, SELL].
+	OrderIDs          []string   `url:"order_ids,omitempty"`                // The ID(s) of order(s).
+	TradeIDs          []string   `url:"trade_ids,omitempty"`                // The ID(s) of the trades of fills.
+	ProductIDs        []string   `url:"product_ids,omitempty"`              // The ID(s) of the product(s) to filter fills by.
+	StartSequenceTime *time.Time `url:"start_sequence_timestamp,omitempty"` // Only fills with a trade time after the specified start date are returned.
+	EndSequenceTime   *time.Time `url:"end_sequence_timestamp,omitempty"`   // Only fills with a trade time before the specified end date are returned.
+	RetailPortfolioID *string    `url:"retail_portfolio_id,omitempty"`      // (Deprecated) Only orders matching this retail portfolio id are returned. Only applicable for legacy keys. CDP keys will default to the key's permissioned portfolio.
+	Limit             *int32     `url:"limit,omitempty"`                    // The number of orders to display per page (no default amount). If has_next is true, additional pages of orders are available to be fetched. Use the cursor parameter to start on a specified page.
+	Cursor            *string    `url:"cursor,omitempty"`                   // For paginated responses, returns all responses that come after this value.
+	SortBy            *string    `url:"sort_by,omitempty"`                  // Sort results by a field, results use unstable pagination. Default is to sort by creation time.
 }
 
 type ListFillsResponse struct {
@@ -62,13 +31,21 @@ type ListFillsResponse struct {
 }
 
 // Get a list of fills filtered by optional query parameters (product_id, order_id, etc).
-func (s *OrdersService) ListFills(ctx context.Context, options *ListOrderFillsOptions) (*ListFillsResponse, error) {
-	var fills ListFillsResponse
+//
+// https://docs.cdp.coinbase.com/coinbase-app/trade/reference/retailbrokerageapi_getfills
+func (s *OrdersService) ListFills(
+	ctx context.Context,
+	options *ListOrderFillsOptions,
+) (*ListFillsResponse, error) {
 
-	err := s.client.get(ctx, s.client.baseURL+"/api/v3/brokerage/orders/historical/fills", &options, &fills)
+	u := s.client.baseURL + "/api/v3/brokerage/orders/historical/fills"
+
+	var resp ListFillsResponse
+
+	err := s.client.get(ctx, u, &options, &resp)
 	if err != nil {
 		err = fmt.Errorf("failed to list historical fills: %w", err)
 	}
 
-	return &fills, err
+	return &resp, err
 }

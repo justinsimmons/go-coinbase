@@ -374,3 +374,402 @@ type FuturesSweep struct {
 	Status          *SweepStatus      `json:"status,omitempty"`           // A pending sweep is a sweep that has not started processing and can be cancelled. A processing sweep is a sweep that is currently being processed and cannot be cancelled.
 	ScheduledTime   *time.Time        `json:"scheduled_time,omitempty"`   // The timestamp at which the sweep request was submitted.
 }
+
+// Reason for failure to cancel order.
+//
+//go:generate enumer -type=CancelOrderFailureReason -transform=snake-upper -trimprefix=CancelOrderFailureReason -json -text
+type CancelOrderFailureReason byte
+
+const (
+	CancelOrderFailureReasonUnknownCancelFailureReason CancelOrderFailureReason = iota
+	CancelOrderFailureReasonInvalidCancelRequest
+	CancelOrderFailureReasonUnknownCancelOrder
+	CancelOrderFailureReasonCommanderRejectedCancelOrder
+	CancelOrderFailureReasonDuplicateCancelRequest
+	CancelOrderFailureReasonInvalidCancelProductId
+	CancelOrderFailureReasonInvalidCancelFcmTradingSession
+	CancelOrderFailureReasonNotAllowedToCancel
+	CancelOrderFailureReasonOrderIsFullyFilled
+	CancelOrderFailureReasonOrderIsBeingReplaced
+)
+
+// Result when order is attempted to be canceled.
+type CancelOrderResult struct {
+	Success       bool                     `json:"success"`        // Whether the cancel request was submitted successfully.
+	FailureReason CancelOrderFailureReason `json:"failure_reason"` // The reason the cancel request did not get submitted.
+	OrderID       string                   `json:"order_id"`       // The IDs of order cancel request was initiated for.
+}
+
+// Side of a trade.
+//
+//go:generate enumer -type=Side -transform=snake-upper -trimprefix=Side -json -text
+type Side byte
+
+const (
+	SideBuy Side = iota
+	SideSell
+)
+
+type OrderSuccessMetadata struct {
+	OrderID       string  `json:"order_id"`                  // The ID of the order.
+	ProductID     *string `json:"product_id,omitempty"`      // The trading pair (e.g. 'BTC-USD').
+	Side          *Side   `json:"side,omitempty"`            // The side of the market that the order is on (e.g. 'BUY', 'SELL').
+	ClientOrderID *string `json:"client_order_id,omitempty"` // The unique ID provided for the order (used for identification purposes).
+}
+
+// Order failure reason.
+//
+//go:generate enumer -type=OrderFailureReason -transform=snake-upper -trimprefix=OrderFailureReason -json -text
+type OrderFailureReason byte
+
+const (
+	OrderFailureReasonUnknownFailureReason OrderFailureReason = iota
+	OrderFailureReasonUnsupportedOrderConfiguration
+	OrderFailureReasonInvalidSide
+	OrderFailureReasonInvalidProductID
+	OrderFailureReasonInvalidSizePrecision
+	OrderFailureReasonInvalidPricePrecision
+	OrderFailureReasonInsufficientFund
+	OrderFailureReasonInvalidLedgerBalance
+	OrderFailureReasonOrderEntryDisabled
+	OrderFailureReasonIneligiblePair
+	OrderFailureReasonInvalidLimitPricePostOnly
+	OrderFailureReasonInvalidLimitPrice
+	OrderFailureReasonInvalidNoLiquidity
+	OrderFailureReasonInvalidRequest
+	OrderFailureReasonCommanderRejectedNewOrder
+	OrderFailureReasonInsufficientFunds
+	OrderFailureReasonInLiquidation
+	OrderFailureReasonInvalidMarginType
+	OrderFailureReasonInvalidLeverage
+	OrderFailureReasonUntradableProduct
+	OrderFailureReasonInvalidFcmTradingSession
+	OrderFailureReasonGeofencingRestriction
+	OrderFailureReasonQuoteSize
+	OrderFailureReasonQuoteSizeNotAllowedForBracket
+	OrderFailureReasonInvalidBracketPrices
+	OrderFailureReasonMissingMarketTradeData
+	OrderFailureReasonInvalidBracketLimitPrice
+	OrderFailureReasonInvalidBracketStopTriggerPrice
+	OrderFailureReasonBracketLimitPriceOutOfBounds
+	OrderFailureReasonStopTriggerPriceOutOfBounds
+	OrderFailureReasonBracketOrderNotSupported
+	OrderFailureReasonFokDisabled
+	OrderFailureReasonFokOnlyAllowedOnLimitOrders
+	OrderFailureReasonPostOnlyNotAllowedWithFok
+	OrderFailureReasonUboHighLeverageQuantityBreached
+	OrderFailureReasonEndTimeTooFarInFuture
+	OrderFailureReasonLimitPriceTooFarFromMarket
+	OrderFailureReasonOpenBracketOrders
+	OrderFailureReasonFuturesAfterHourInvalidOrderType
+	OrderFailureReasonFuturesAfterHourInvalidTimeInForce
+	OrderFailureReasonInvalidAttachedTakeProfitPrice
+	OrderFailureReasonInvalidAttachedStopLossPrice
+	OrderFailureReasonInvalidAttachedTakeProfitPricePrecision
+	OrderFailureReasonInvalidAttachedStopLossPricePrecision
+	OrderFailureReasonInvalidAttachedTakeProfitPriceOutOfBounds
+	OrderFailureReasonInvalidAttachedStopLossPriceOutOfBounds
+	OrderFailureReasonInvalidAttachedTakeProfitPriceExceedsMaxDistance
+	OrderFailureReasonInvalidAttachedTakeProfitSizeBelowMin
+	OrderFailureReasonAttachedOrderSizeMustBeNil
+)
+
+// PreviewFailureReason represents the failure reason for a preview.
+//
+//go:generate enumer -type=PreviewFailureReason -transform=snake-upper -trimprefix=PreviewFailureReason -json -text
+type PreviewFailureReason byte
+
+const (
+	PreviewFailureReasonUnknown PreviewFailureReason = iota
+	PreviewFailureReasonPreviewMissingCommissionRate
+	PreviewFailureReasonPreviewInvalidSide
+	PreviewFailureReasonPreviewInvalidOrderConfig
+	PreviewFailureReasonPreviewInvalidProductID
+	PreviewFailureReasonPreviewInvalidSizePrecision
+	PreviewFailureReasonPreviewInvalidPricePrecision
+	PreviewFailureReasonPreviewMissingProductPriceBook
+	PreviewFailureReasonPreviewInvalidLedgerBalance
+	PreviewFailureReasonPreviewInsufficientLedgerBalance
+	PreviewFailureReasonPreviewInvalidLimitPricePostOnly
+	PreviewFailureReasonPreviewInvalidLimitPrice
+	PreviewFailureReasonPreviewInvalidNoLiquidity
+	PreviewFailureReasonPreviewInsufficientFund
+	PreviewFailureReasonPreviewInvalidCommissionConfiguration
+	PreviewFailureReasonPreviewInvalidStopPrice
+	PreviewFailureReasonPreviewInvalidBaseSizeTooLarge
+	PreviewFailureReasonPreviewInvalidBaseSizeTooSmall
+	PreviewFailureReasonPreviewInvalidQuoteSizePrecision
+	PreviewFailureReasonPreviewInvalidQuoteSizeTooLarge
+	PreviewFailureReasonPreviewInvalidPriceTooLarge
+	PreviewFailureReasonPreviewInvalidQuoteSizeTooSmall
+	PreviewFailureReasonPreviewInsufficientFundsForFutures
+	PreviewFailureReasonPreviewBreachedPriceLimit
+	PreviewFailureReasonPreviewBreachedAccountPositionLimit
+	PreviewFailureReasonPreviewBreachedCompanyPositionLimit
+	PreviewFailureReasonPreviewInvalidMarginHealth
+	PreviewFailureReasonPreviewRiskProxyFailure
+	PreviewFailureReasonPreviewUntradableFcmAccountStatus
+	PreviewFailureReasonPreviewInLiquidation
+	PreviewFailureReasonPreviewInvalidMarginType
+	PreviewFailureReasonPreviewInvalidLeverage
+	PreviewFailureReasonPreviewUntradableProduct
+	PreviewFailureReasonPreviewInvalidFcmTradingSession
+	PreviewFailureReasonPreviewNotAllowedByMarketState
+	PreviewFailureReasonPreviewBreachedOpenInterestLimit
+	PreviewFailureReasonPreviewGeofencingRestriction
+	PreviewFailureReasonPreviewInvalidEndTime
+	PreviewFailureReasonPreviewOppositeMarginTypeExists
+	PreviewFailureReasonPreviewQuoteSizeNotAllowedForBracket
+	PreviewFailureReasonPreviewInvalidBracketPrices
+	PreviewFailureReasonPreviewMissingMarketTradeData
+	PreviewFailureReasonPreviewInvalidBracketLimitPrice
+	PreviewFailureReasonPreviewInvalidBracketStopTriggerPrice
+	PreviewFailureReasonPreviewBracketLimitPriceOutOfBounds
+	PreviewFailureReasonPreviewStopTriggerPriceOutOfBounds
+	PreviewFailureReasonPreviewBracketOrderNotSupported
+	PreviewFailureReasonPreviewInvalidStopPricePrecision
+	PreviewFailureReasonPreviewStopPriceAboveLimitPrice
+	PreviewFailureReasonPreviewStopPriceBelowLimitPrice
+	PreviewFailureReasonPreviewStopPriceAboveLastTradePrice
+	PreviewFailureReasonPreviewStopPriceBelowLastTradePrice
+	PreviewFailureReasonPreviewFokDisabled
+	PreviewFailureReasonPreviewFokOnlyAllowedOnLimitOrders
+	PreviewFailureReasonPreviewPostOnlyNotAllowedWithFok
+	PreviewFailureReasonPreviewUboHighLeverageQuantityBreached
+	PreviewFailureReasonPreviewEcosystemLeverageUtilizationBreached
+	PreviewFailureReasonPreviewCloseOnlyFailure
+	PreviewFailureReasonPreviewUboHighLeverageNotionalBreached
+	PreviewFailureReasonPreviewEndTimeTooFarInFuture
+	PreviewFailureReasonPreviewLimitPriceTooFarFromMarket
+	PreviewFailureReasonPreviewFuturesAfterHourInvalidOrderType
+	PreviewFailureReasonPreviewFuturesAfterHourInvalidTimeInForce
+	PreviewFailureReasonPreviewInvalidAttachedTakeProfitPrice
+	PreviewFailureReasonPreviewInvalidAttachedStopLossPrice
+	PreviewFailureReasonPreviewInvalidAttachedTakeProfitPricePrecision
+	PreviewFailureReasonPreviewInvalidAttachedStopLossPricePrecision
+	PreviewFailureReasonPreviewInvalidAttachedTakeProfitPriceOutOfBounds
+	PreviewFailureReasonPreviewInvalidAttachedStopLossPriceOutOfBounds
+	PreviewFailureReasonPreviewInvalidBracketOrderSide
+	PreviewFailureReasonPreviewBracketOrderSizeExceedsPosition
+	PreviewFailureReasonPreviewOrderSizeExceedsBracketedPosition
+	PreviewFailureReasonPreviewInvalidLimitPricePrecision
+	PreviewFailureReasonPreviewInvalidStopTriggerPricePrecision
+	PreviewFailureReasonPreviewInvalidAttachedTakeProfitPriceExceedsMaxDistanceFromOriginatingPrice
+	PreviewFailureReasonPreviewInvalidAttachedTakeProfitSizeBelowMin
+	PreviewFailureReasonPreviewAttachedOrderSizeMustBeNil
+	PreviewFailureReasonPreviewBelowMinSizeForDuration
+)
+
+type OrderErrorMetadata struct {
+	Error                 *OrderFailureReason   `json:"error"`                    // **(Deprecated)** The reason the order failed to be created
+	Message               *string               `json:"message"`                  // Generic error message explaining why the order was not created.
+	ErrorDetails          *string               `json:"error_details"`            // Descriptive error message explaining why the order was not created.
+	PreviewFailureReason  *PreviewFailureReason `json:"preview_failure_reason"`   // **(Deprecated)** The reason the order failed to be created
+	NewOrderFailureReason *OrderFailureReason   `json:"new_order_failure_reason"` // The reason the order failed to be created.
+}
+
+// The amount of the second Asset in the Trading Pair.
+type QuoteSize struct {
+	// The amount of the second Asset in the Trading Pair.
+	// For example, on the BTC/USD Order Book, USD is the Quote Asset.
+	QuoteSize *string `json:"quote_size,omitempty"`
+}
+
+// The amount of the first Asset in the Trading Pair.
+type BaseSize struct {
+	// The amount of the first Asset in the Trading Pair.
+	// For example, on the BTC-USD Order Book, BTC is the Base Asset.
+	BaseSize *string `json:"base_size,omitempty"`
+}
+
+// Order Good Till Date.
+// Order will be canceled if not filled by date.
+type GoodTillDate struct {
+	// The time at which the order will be cancelled if it is not Filled.
+	EndTime *time.Time `json:"end_time,omitempty"`
+}
+
+// Embeds stop trigger functionality in an order.
+type StopTrigger struct {
+	// The price level (in quote currency) where the position will be exited.
+	// When triggered, a stop limit order is automatically placed with a limit
+	// price 5% higher for BUYS and 5% lower for SELLS.
+	StopTriggerPrice *string `json:"stop_trigger_price,omitempty"`
+}
+
+type LimitPrice struct {
+	// The specified price, or better, that the Order should be executed at.
+	// A Buy Order will execute at or lower than the limit price.
+	// A Sell Order will execute at or higher than the limit price.
+	LimitPrice *string `json:"limit_price,omitempty"`
+}
+
+// Enable or disable Post-only Mode.
+type PostOnly struct {
+	// Enable or disable Post-only Mode. When enabled, only Maker Orders will
+	// be posted to the Order Book. Orders that will be posted as a Taker
+	// Order will be rejected.
+	PostOnly *bool `json:"post_only,omitempty"`
+}
+
+type StopOrder struct {
+	// The specified price that will trigger the placement of the Order.
+	StopPrice *string `json:"stop_price,omitempty"`
+	// The direction of the stop limit Order. If Up, then the Order will
+	// trigger when the last trade price goes above the stop_price. If Down,
+	// then the Order will trigger when the last trade price goes below the
+	// stop_price.
+	StopDirection *StopDirection `json:"stop_direction,omitempty"`
+}
+
+// A time-weighted average price (TWAP) order type that calculates the average
+// price of a product to programmatically execute an order over a specified
+// duration.
+type TimeWeightedAveragePrice struct {
+	StartTime      *time.Time     `json:"start_time,omitempty"`      // Time at which the order should begin executing.
+	NumberBuckets  *string        `json:"number_buckets,omitempty"`  // The number of smaller buckets/suborders over which the entire order will be broken into. Each suborder will be executed over a duration calculated based on the end_time.
+	BucketSize     *string        `json:"bucket_size,omitempty"`     // The size of each suborder. bucket_size multiplied by number_buckets should match the size of the entire twap order).
+	BucketDuration *time.Duration `json:"bucket_duration,omitempty"` // The duration over which each sub order was executed.
+}
+
+// Market Order Immediate Or Cancel.
+// Market orders are used to BUY or SELL a desired product at the given market price. Immediate Or Cancel (ioc): orders instantly cancel the remaining size of the limit order instead of opening it on the book.
+type MarketOrderIOC struct {
+	BaseSize
+	QuoteSize
+}
+
+// Buy or sell a specified quantity of an Asset at a specified price.
+// The Order will only post to the Order Book if it will immediately Fill;
+// any remaining quantity is canceled. Read more on Limit Orders:
+// https://help.coinbase.com/en/coinbase/trading-and-funding/advanced-trade/order-types#limit-order
+type LimitOrderIOC struct {
+	BaseSize
+	QuoteSize
+	LimitPrice
+}
+
+// Limit Order Good Till Canceled.
+// Limit orders are triggered based on the instructions around quantity and
+// price: base_size represents the quantity of your base currency to spend;
+// limit_price represents the maximum price at which the order should be filled.
+// Good Till Canceled (gtc): orders remain open on the book until canceled.
+type LimitOrderGTC struct {
+	BaseSize
+	QuoteSize
+	LimitPrice
+	PostOnly
+}
+
+// Limit Order Good Till Date.
+// Limit orders are triggered based on the instructions around quantity and
+// price: base_size represents the quantity of your base currency to spend;
+// limit_price represents the maximum price at which the order should be filled.
+// Good Till Date (gtd): orders are valid till a specified date or time.
+type LimitOrderGTD struct {
+	BaseSize
+	QuoteSize
+	LimitPrice
+	PostOnly
+	GoodTillDate
+}
+
+type TwapLimitGTD struct {
+	BaseSize
+	QuoteSize
+	LimitPrice
+	TimeWeightedAveragePrice
+	GoodTillDate
+}
+
+//go:generate enumer -type=StopDirection -transform=snake-upper -json -text
+type StopDirection byte
+
+const (
+	StopDirectionStopUp StopDirection = iota
+	StopDirectionStopDown
+)
+
+// Stop Order Good Till Canceled.
+// Stop orders are triggered based on the movement of the last trade price. The last trade price is the last price at which an order was filled.
+// Good Till Canceled (gtc): orders remain open on the book until canceled.
+type StopLimitOrderGTC struct {
+	BaseSize
+	LimitPrice
+	StopOrder
+}
+
+// Stop Order Good Till Date.
+// Stop orders are triggered based on the movement of the last trade price. The last trade price is the last price at which an order was filled.
+// Good Till Date (gtd): orders are valid till a specified date or time.
+type StopLimitOrderGTD struct {
+	BaseSize
+	LimitPrice
+	StopOrder
+	GoodTillDate
+}
+
+type TriggerBracketGTC struct {
+	BaseSize
+	LimitPrice
+	StopTrigger
+}
+
+type TriggerBracketGTD struct {
+	BaseSize
+	LimitPrice
+	StopTrigger
+	GoodTillDate
+}
+
+// Configuration of the order, it can only consist of a single order type at at time.
+// The rest will not be populated.
+type OrderConfiguration struct {
+	MarketIOC         *MarketOrderIOC    `json:"market_market_ioc,omitempty"`         // Buy or sell a specified quantity of an Asset at the current best available market price. [Read more on Market Orders](https://help.coinbase.com/en/coinbase/trading-and-funding/advanced-trade/order-types#market-order).
+	SorLimitIOC       *LimitOrderIOC     `json:"sor_limit_ioc,omitempty"`             // Buy or sell a specified quantity of an Asset at a specified price. The Order will only post to the Order Book if it will immediately Fill; any remaining quantity is canceled. [Read more on Limit Orders.](https://help.coinbase.com/en/coinbase/trading-and-funding/advanced-trade/order-types#limit-order).
+	LimitGTC          *LimitOrderGTC     `json:"limit_limit_gtc,omitempty"`           // Buy or sell a specified quantity of an Asset at a specified price. If posted, the Order will remain on the Order Book until canceled. [Read more on Limit Orders.](https://help.coinbase.com/en/coinbase/trading-and-funding/advanced-trade/order-types#limit-order).
+	LimitGTD          *LimitOrderGTD     `json:"limit_limit_gtd,omitempty"`           // Buy or sell a specified quantity of an Asset at a specified price. If posted, the Order will remain on the Order Book until a certain time is reached or the Order is canceled. [Read more on Limit Orders.](https://help.coinbase.com/en/coinbase/trading-and-funding/advanced-trade/order-types#limit-order).
+	LimitFOK          *LimitOrderIOC     `json:"limit_limit_fok,omitempty,omitempty"` // Buy or sell a specified quantity of an Asset at a specified price. The Order will only post to the Order Book if it is to immediately and completely Fill. [Read more on Limit Orders.](https://help.coinbase.com/en/coinbase/trading-and-funding/advanced-trade/order-types#limit-order).
+	TwapLimitGTD      *TwapLimitGTD      `json:"twap_limit_gtd,omitempty,omitempty"`  // A time-weighted average price (TWAP) order type that calculates the average price of a product to programmatically execute an order over a specified duration.
+	StopLimitGTC      *StopLimitOrderGTC `json:"stop_limit_stop_limit_gtc,omitempty"` // Posts an Order to buy or sell a specified quantity of an Asset, but only if and when the last trade price on the Order Book equals or surpasses the Stop Price. If posted, the Order will remain on the Order Book until canceled. [Read more on Stop-Limit Orders.](https://help.coinbase.com/en/coinbase/trading-and-funding/advanced-trade/order-types#stop-limit-order).
+	StopLimitGTD      *StopLimitOrderGTD `json:"stop_limit_stop_limit_gtd,omitempty"` // Posts an Order to buy or sell a specified quantity of an Asset, but only if and when the last trade price on the Order Book equals or surpasses the Stop Price. If posted, the Order will remain on the Order Book until a certain time is reached or the Order. [Read more on Stop-Limit Orders.](https://help.coinbase.com/en/coinbase/trading-and-funding/advanced-trade/order-types#stop-limit-order).
+	TriggerBracketGTC *TriggerBracketGTC `json:"trigger_bracket_gtc,omitempty"`       // A Limit Order to buy or sell a specified quantity of an Asset at a specified price, with stop limit order parameters embedded in the order. If posted, the Order will remain on the Order Book until canceled. [Read more on Bracket Orders.](https://help.coinbase.com/en/coinbase/trading-and-funding/advanced-trade/order-types#bracket-order).
+	TriggerBracketGTD *TriggerBracketGTD `json:"trigger_bracket_gtd,omitempty"`       // A Limit Order to buy or sell a specified quantity of an Asset at a specified price, with stop limit order parameters embedded in the order. If posted, the Order will remain on the Order Book until a certain time is reached or the Order is canceled. [Read more on Bracket Orders.](https://help.coinbase.com/en/coinbase/trading-and-funding/advanced-trade/order-types#bracket-order).
+}
+
+// Margin type.
+//
+//go:generate enumer -type=MarginType -transform=snake-upper -trimprefix=MarginType -json -text
+type MarginType byte
+
+const (
+	MarginTypeIsolated MarginType = iota
+	MarginTypeCross
+)
+
+// Edit Order Failure Reason.
+//
+//go:generate enumer -type=EditFailureReason -transform=snake-upper -trimprefix=EditFailureReason -json -text
+type EditFailureReason byte
+
+const (
+	EditFailureReasonUnknownOrderEditFailureReason EditFailureReason = iota
+	EditFailureReasonCommanderRejectedEditOrder
+	EditFailureReasonCannotEditToBelowFilledSize
+	EditFailureReasonOrderNotFound
+	EditFailureReasonCallerIdMismatch
+	EditFailureReasonOnlyLimitOrderEditsSupported
+	EditFailureReasonInvalidEditedSize
+	EditFailureReasonInvalidEditedPrice
+	EditFailureReasonInvalidOriginalSize
+	EditFailureReasonInvalidOriginalPrice
+	EditFailureReasonEditRequestEqualToOriginalRequest
+	EditFailureReasonOnlyOpenOrdersCanBeEdited
+	EditFailureReasonSizeInQuoteEditsNotAllowed
+	EditFailureReasonOrderIsAlreadyBeingReplaced
+)
+
+type EditOrderError struct {
+	EditFailureReason    *EditFailureReason    `json:"edit_failure_reason,omitempty"`
+	PreviewFailureReason *PreviewFailureReason `json:"preview_failure_reason,omitempty"`
+}
