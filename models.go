@@ -39,6 +39,7 @@ const (
 )
 
 // Available balance belonging to coinbase account.
+// TODO:: Rename to something more generic.
 type AvailableBalance struct {
 	Value    string `json:"value"`    // Amount of currency that this object represents.
 	Currency string `json:"currency"` // Denomination of the currency.
@@ -967,4 +968,126 @@ type PaymentMethod struct {
 	AllowWithdraw *bool      `json:"allow_withdraw,omitempty"` // Whether or not this payment method can perform withdrawals.
 	CreatedAt     *time.Time `json:"created_at,omitempty"`     // Time at which this payment method was created.
 	UpdatedAt     *time.Time `json:"updated_at,omitempty"`     // Time at which this payment method was updated.
+}
+
+// Portfolio margin flag.
+//
+//go:generate enumer -type=PortfolioMarginFlag -transform=snake-upper -json -text
+type PortfolioMarginFlag byte
+
+const (
+	PortfolioMarginFlagsUnspecified PortfolioMarginFlag = iota
+	PortfolioMarginFlagsInLiquidation
+)
+
+// Portfolio liquidation status.
+//
+//go:generate enumer -type=PortfolioLiquidationStatus -transform=snake-upper -json -text
+type PortfolioLiquidationStatus byte
+
+const (
+	PortfolioLiquidationStatusUnspecified PortfolioLiquidationStatus = iota
+	PortfolioLiquidationStatusCanceling
+	PortfolioLiquidationStatusAutoLiquidating
+	PortfolioLiquidationStatusLspAssignment
+	PortfolioLiquidationStatusCustomerAssignment
+	PortfolioLiquidationStatusStatusManual
+	PortfolioLiquidationStatusStatusNotLiquidating
+)
+
+// Perpetuals portfolio summary.
+type PortfolioSummary struct {
+	UnrealizedPNL       *AvailableBalance `json:"unrealized_pnl,omitempty"`
+	BuyingPower         *AvailableBalance `json:"buying_power,omitempty"`
+	TotalBalance        *AvailableBalance `json:"total_balance,omitempty"`
+	MaxWithdrawalAmount *AvailableBalance `json:"max_withdrawal_amount,omitempty"`
+}
+
+// Perpetuals portfolio.
+type PerpetualsPortfolio struct {
+	PortfolioUUID              *string                     `json:"portfolio_uuid,omitempty"`           // The portfolio UUID.
+	Collateral                 *string                     `json:"collateral,omitempty"`               // The total collateral value in USDC for the portfolio.
+	PositionNotional           *string                     `json:"position_notional,omitempty"`        // The total position notional value in USDC for all positions in the portfolio.
+	OpenPositionNotional       *string                     `json:"open_position_notional,omitempty"`   // The total position notional value in USDC for all open orders and positions.
+	PendingFees                *string                     `json:"pending_fees,omitempty"`             // The accrued fees that has not been paid yet in USDC.
+	Borrow                     *string                     `json:"borrow,omitempty"`                   // Total borrow amount in USDC (nets the USDC balance, position PNL, held USDC, accrued interest and rolling debt).
+	AccruedInterest            *string                     `json:"accrued_interest,omitempty"`         // Interest charged for borrowed USDC balances.
+	RollingDebt                *string                     `json:"rolling_debt,omitempty"`             // Amount of settled transactions that hasn't been paid.
+	PortfolioInitialMargin     *string                     `json:"portfolio_initial_margin,omitempty"` // The weighted average of all the position's initial margin utilization.
+	PortfolioImNotional        *AvailableBalance           `json:"portfolio_im_notional,omitempty"`
+	PortfolioMaintenanceMargin *string                     `json:"portfolio_maintenance_margin,omitempty"` // The maintenance margin of the portfolio.
+	PortfolioMmNotional        *AvailableBalance           `json:"portfolio_mm_notional,omitempty"`
+	LiquidationPercentage      *string                     `json:"liquidation_percentage,omitempty"` // The liquidation percentage of the portfolio.
+	LiquidationBuffer          *string                     `json:"liquidation_buffer,omitempty"`     // The liquidation buffer of the portfolio.
+	MarginType                 *MarginType                 `json:"margin_type,omitempty"`
+	MarginFlags                *PortfolioMarginFlag        `json:"margin_flags,omitempty"`
+	LiquidationStatus          *PortfolioLiquidationStatus `json:"liquidation_status,omitempty"`
+	UnrealizedPNL              *AvailableBalance           `json:"unrealized_pnl,omitempty"`
+	TotalBalance               *AvailableBalance           `json:"total_balance,omitempty"`
+}
+
+// Position Side.
+//
+//go:generate enumer -type=PositionSide -transform=snake-upper -json -text
+type PositionSide byte
+
+const (
+	PositionSideUnknown PositionSide = iota
+	PositionSideLong
+	PositionSideShort
+)
+
+type PerpetualsPosition struct {
+	ProductID        *string           `json:"product_id,omitempty"`     // The unique identifier of the instrument the position is in.
+	ProductUUID      *string           `json:"product_uuid,omitempty"`   // The unique identifier of the instrument the position is in.
+	PortfolioUUID    *string           `json:"portfolio_uuid,omitempty"` // The portfolio UUID.
+	Symbol           *string           `json:"symbol,omitempty"`         // The trading pair (e.g. 'BTC-PERP-INTX').
+	VWAP             *AvailableBalance `json:"vwap,omitempty"`
+	EntryVwap        *AvailableBalance `json:"entry_vwap,omitempty"`
+	PositionSide     *PositionSide     `json:"position_side,omitempty"`
+	MarginType       *MarginType       `json:"margin_type,omitempty"`
+	NetSize          *string           `json:"net_size,omitempty"`        // The size of the position with positive values reflecting a long position and negative values reflecting a short position.
+	BuyOrderSize     *string           `json:"buy_order_size,omitempty"`  // Cumulative size of all the open buy orders
+	SellOrderSize    *string           `json:"sell_order_size,omitempty"` // Cumulative size of all the open sell orders.
+	ImContribution   *string           `json:"im_contribution,omitempty"` // The amount this position contributes to the initial margin.
+	UnrealizedPNL    *AvailableBalance `json:"unrealized_pnl,omitempty"`
+	MarkPrice        *AvailableBalance `json:"mark_price,omitempty"`
+	LiquidationPrice *AvailableBalance `json:"liquidation_price,omitempty"`
+	Leverage         *string           `json:"leverage,omitempty"` // The leverage of this position.
+	ImNotional       *AvailableBalance `json:"im_notional,omitempty"`
+	MmNotional       *AvailableBalance `json:"mm_notional,omitempty"`
+	PositionNotional *AvailableBalance `json:"position_notional,omitempty"`
+	AggregatedPNL    *AvailableBalance `json:"aggregated_pnl,omitempty"`
+}
+
+// Perpetuals asset.
+type PerpetualsAsset struct {
+	AssetID                          *string `json:"asset_id,omitempty"`
+	AssetUUID                        *string `json:"asset_uuid,omitempty"`
+	AssetName                        *string `json:"asset_name,omitempty"`
+	Status                           *string `json:"status,omitempty"`
+	CollateralWeight                 *string `json:"collateral_weight,omitempty"`
+	AccountCollateralLimit           *string `json:"account_collateral_limit,omitempty"`
+	EcosystemCollateralLimitBreached *bool   `json:"ecosystem_collateral_limit_breached,omitempty"`
+	AssetIconURL                     *string `json:"asset_icon_url,omitempty"`
+	SupportedNetworksAvailable       *bool   `json:"supported_networks_enabled,omitempty"`
+}
+
+type PerpetualsBalance struct {
+	Asset                        *PerpetualsAsset `json:"asset,omitempty"`
+	Quantity                     *string          `json:"quantity,omitempty"`
+	Hold                         *string          `json:"hold,omitempty"`
+	TransferHold                 *string          `json:"transfer_hold,omitempty"`
+	CollateralValue              *string          `json:"collateral_value,omitempty"`
+	CollateralWeight             *string          `json:"collateral_weight,omitempty"`
+	MaxWithdrawlAmount           *string          `json:"max_withdraw_amount,omitempty"`
+	Loan                         *string          `json:"loan,omitempty"`
+	LoanCollateralRequirementUSD *string          `json:"loan_collateral_requirement_usd,omitempty"`
+	PledgedQuantity              *string          `json:"pledged_quantity,omitempty"`
+}
+
+type PerpetualsPortfolioBalance struct {
+	PortfolioUUID        *string             `json:"portfolio_uuid,omitempty"`
+	Balances             []PerpetualsBalance `json:"balances,omitempty"`
+	IsMarginLimitReached bool                `json:"is_margin_limit_reached,omitempty"`
 }

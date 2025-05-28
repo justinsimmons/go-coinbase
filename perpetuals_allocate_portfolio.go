@@ -23,17 +23,28 @@ type AllocatePortfolioOptions struct {
 	Currency      string    `json:"currency"`       // The currency of funds to be allocated for a specific isolated position.
 }
 
-// Allocate allocates more funds to an isolated position in your Perpetuals portfolio.
-func (s *PortfoliosService) Allocate(ctx context.Context, options AllocatePortfolioOptions) error {
-	b, err := json.Marshal(options)
+// Allocate portfolio funds to a sub-portfolio on Intx Portfolio.
+//
+// https://docs.cdp.coinbase.com/coinbase-app/trade/reference/retailbrokerageapi_allocateportfolio
+func (s *PerpetualsService) Allocate(
+	ctx context.Context,
+	opts *AllocatePortfolioOptions,
+) error {
+
+	u := s.client.baseURL + "/api/v3/brokerage/intx/allocate"
+
+	b, err := json.Marshal(opts)
 	if err != nil {
-		return fmt.Errorf("failed to marshal AllocatePortfolioOptions to JSON: %w", err)
+		return fmt.Errorf(
+			"failed to marshal AllocatePortfolioOptions to JSON: %w",
+			err,
+		)
 	}
 
 	// Response is an empty object. Scan response to map and discard.
 	var resp map[string]any
 
-	err = s.client.post(ctx, s.client.baseURL+"/api/v3/brokerage/intx/allocate", bytes.NewReader(b), &resp)
+	err = s.client.post(ctx, u, bytes.NewReader(b), &resp)
 	if err != nil {
 		return fmt.Errorf("failed to allocate portfolio: %w", err)
 	}
