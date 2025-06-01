@@ -12,11 +12,28 @@ import (
 	"fmt"
 )
 
-// Get gets information on a single product by product ID.
-func (s *ProductsService) Get(ctx context.Context, id string) (*Product, error) {
+type GetProductOptions struct {
+	ProductID            string `url:"-"`                                // The trading pair (e.g. 'BTC-USD').
+	GetTradabilityStatus bool   `url:"get_tradability_status,omitempty"` // Whether or not to populate view_only with the tradability status of the product. This is only enabled for SPOT products.
+}
+
+// Get information on a single product by product ID.
+//
+// https://docs.cdp.coinbase.com/coinbase-app/trade/reference/retailbrokerageapi_getproduct
+func (s *ProductsService) Get(
+	ctx context.Context,
+	opts *GetProductOptions,
+) (*Product, error) {
+
+	u := fmt.Sprintf(
+		"%s/api/v3/brokerage/products/%s",
+		s.client.baseURL,
+		opts.ProductID,
+	)
+
 	var product Product
 
-	err := s.client.get(ctx, fmt.Sprintf("%s/api/v3/brokerage/products/%s", s.client.baseURL, id), nil, &product)
+	err := s.client.get(ctx, u, nil, &product)
 	if err != nil {
 		err = fmt.Errorf("failed to fetch product '%s': %w", id, err)
 	}

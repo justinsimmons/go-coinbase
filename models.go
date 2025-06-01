@@ -1222,3 +1222,177 @@ type PortfolioBreakdown struct {
 	PerpPositions    []PerpPosition             `json:"perp_positions"`
 	FuturesPositions []FuturesBreakdownPosition `json:"futures_positions"`
 }
+
+// Trade.
+type Trade struct {
+	ID        *string    `json:"trade_id,omitempty"`   // The ID of the trade that was placed.
+	ProductID *string    `json:"product_id,omitempty"` // The trading pair.
+	Price     *string    `json:"price,omitempty"`      // The price of the trade, in quote currency.
+	Size      *string    `json:"size,omitempty"`       // The size of the trade, in base currency.
+	Time      *time.Time `json:"time,omitempty"`       // The time of the trade.
+	Side      *Side      `json:"side,omitempty"`       // Side of the transaction.
+	Exchange  *string    `json:"exchange,omitempty"`   // The best bid for the `product_id`, in quote currency.
+}
+
+// Coinbase Product.
+type Product struct {
+	ID                            string                    `json:"product_id"`                   // The trading pair (e.g. 'BTC-USD').
+	Price                         string                    `json:"price"`                        // The current price for the product, in quote currency.
+	PricePercentageChange24Hours  string                    `json:"price_percentage_change_24h"`  // The amount the price of the product has changed, in percent, in the last 24 hours.
+	Volume24Hours                 string                    `json:"volume_24h"`                   // The trading volume for the product in the last 24 hours.
+	VolumePercentageChange24Hours string                    `json:"volume_percentage_change_24h"` // The percentage amount the volume of the product has changed in the last 24 hours.
+	BaseIncrement                 string                    `json:"base_increment"`               // Minimum amount base value can be increased or decreased at once.
+	QuoteIncrement                string                    `json:"quote_increment"`              // Minimum amount quote value can be increased or decreased at once.
+	QuoteMinimumSize              string                    `json:"quote_min_size"`               // Minimum size that can be represented of quote currency.
+	QuoteMaximumSize              string                    `json:"quote_max_size"`               // Maximum size that can be represented of quote currency.
+	BaseMinimimSize               string                    `json:"base_min_size"`                // Minimum size that can be represented of base currency.
+	BaseMaximumSize               string                    `json:"base_max_size"`                // Maximum size that can be represented of base currency.
+	BaseName                      string                    `json:"base_name"`                    // Name of the base currency.
+	QuoteName                     string                    `json:"quote_name"`                   // Name of the quote currency.
+	Watched                       bool                      `json:"watched"`                      // Whether or not the product is on the user's watchlist.
+	IsDisabled                    bool                      `json:"is_disabled"`                  // Whether or not the product is disabled for trading.
+	New                           bool                      `json:"new"`                          // Whether or not the product is 'new'.
+	Status                        string                    `json:"status"`                       // Status of the product.
+	CancelOnly                    bool                      `json:"cancel_only"`                  // Whether or not orders of the product can only be cancelled, not placed or edited.
+	LimitOnly                     bool                      `json:"limit_only"`                   // Whether or not orders of the product can only be limit orders, not market orders.
+	PostOnly                      bool                      `json:"post_only"`                    // Whether or not orders of the product can only be posted, not cancelled.
+	TradingDisabled               bool                      `json:"trading_disabled"`             // Whether or not the product is disabled for trading for all market participants.
+	AuctionMode                   bool                      `json:"auction_mode"`                 // Whether or not the product is in auction mode.
+	Type                          *ProductType              `json:"product_type"`                 // Type of product.
+	QuoteCurrencyID               *string                   `json:"quote_currency_id,omitempty"`  // Symbol of the quote currency.
+	BaseCurrencyID                *string                   `json:"base_currency_id,omitempty"`   // Symbol of the base currency.
+	FCMTradingSessionDetails      *FcmTradingSessionDetails `json:"fcm_trading_session_details,omitempty"`
+	MidMarketPrice                *string                   `json:"mid_market_price,omitempty"`             // The current midpoint of the bid-ask spread, in quote currency.
+	Alias                         *string                   `json:"alias,omitempty"`                        // Product id for the corresponding unified book.
+	AliasTo                       []string                  `json:"alias_to"`                               // Product ids that this product serves as an alias for.
+	BaseDisplaySymbol             string                    `json:"base_display_symbol"`                    // Symbol of the base display currency.
+	QuoteDisplaySymbol            string                    `json:"quote_display_symbol"`                   // Symbol of the quote display currency.
+	ViewOnly                      *bool                     `json:"view_only,omitempty"`                    // Reflects whether an FCM product has expired. For SPOT, set get_tradability_status to get a return value here. Defaulted to false for all other product types.
+	PriceIncrement                *string                   `json:"price_increment,omitempty"`              // Minimum amount price can be increased or decreased at once.
+	DisplayName                   *string                   `json:"display_name,omitempty"`                 // Display name for the product e.g. BTC-PERP-INTX => BTC PERP.
+	ProductVenue                  *ProductVenue             `json:"product_venue,omitempty"`                // The sole venue id for the product. Defaults to CBE if the product is not specific to a single venue.
+	ApproximateQuote24HourVolume  *string                   `json:"approximate_quote_24h_volume,omitempty"` // The approximate trading volume for the product in the last 24 hours based on the current quote.
+	NewAt                         *time.Time                `json:"new_at,omitempty"`                       // The timestamp when the product was listed. This is only populated if product has new tag.
+	FutureProductDetails          *FutureProductDetails     `json:"future_product_details"`
+}
+
+//go:generate enumer -type=FcmTradingSessionState -transform=snake-upper -json -text
+type FcmTradingSessionState byte
+
+const (
+	FcmTradingSessionStateUnknown FcmTradingSessionState = iota
+	FcmTradingSessionStatePreOpen
+	FcmTradingSessionStatePreOpenNoCancel
+	FcmTradingSessionStateOpen
+	FcmTradingSessionStateClose
+)
+
+// This helps distinguish between regular market close and downtimes due to
+// maintenance.
+//
+//go:generate enumer -type=FcmTradingSessionClosedReason -transform=snake-upper -json -text
+type FcmTradingSessionClosedReason byte
+
+const (
+	FcmTradingSessionClosedReasonUndefined FcmTradingSessionClosedReason = iota
+	FcmTradingSessionClosedReasonRegularMarketClose
+	FcmTradingSessionClosedReasonExchangeMaintenance
+	FcmTradingSessionClosedReasonVendorMaintenance
+)
+
+// Window of time.
+type TimeWindow struct {
+	Start *time.Time `json:"start_time,omitempty"`
+	End   *time.Time `json:"end_time,omitempty"`
+}
+
+type FcmTradingSessionDetails struct {
+	IsSessionOpen                *bool                          `json:"is_session_open"`
+	OpenTime                     *time.Time                     `json:"open_time"`
+	CloseTime                    *time.Time                     `json:"close_time"`
+	SessionState                 *FcmTradingSessionState        `json:"session_state,omitempty"`
+	AfterHoursOrderEntryDisabled *bool                          `json:"after_hours_order_entry_disabled,omitempty"`
+	ClosedReason                 *FcmTradingSessionClosedReason `json:"closed_reason,omitempty"` // This helps distinguish between regular market close and downtimes due to maintenance.
+	Maintenance                  *TimeWindow                    `json:"maintenance,omitempty"`   // Fcm specific scheduled maintenance details.
+}
+
+//go:generate enumer -type=RiskManagementType -transform=snake-upper -trimprefix=RiskManagementType -json -text
+type RiskManagementType byte
+
+const (
+	RiskManagementTypeUnknownRiskManagementType RiskManagementType = iota
+	RiskManagementTypeManagedByFcm
+	RiskManagementTypeMangedByVenue
+)
+
+type PerpetualDetails struct {
+	OpenInterest   *string    `json:"open_interest"`
+	FundingRate    *string    `json:"funding_rate,omitempty"`
+	FundingTime    *time.Time `json:"funding_time,omitempty"`
+	MaxLeverage    *string    `json:"max_leverage,omitempty"`
+	BaseAssetUUID  *string    `json:"base_asset_uuid,omitempty"`
+	UnderlyingType *string    `json:"underlying_type,omitempty"`
+}
+
+type FutureProductDetails struct {
+	Venue                  *string             `json:"venue"`
+	ContractCode           *string             `json:"contract_code"`
+	ContractExpiry         *time.Time          `json:"contract_expiry"`
+	ContractSize           *string             `json:"contract_size"`
+	ContractRootUnit       *string             `json:"contract_root_unit"`
+	GroupDescription       *string             `json:"group_description"` // Descriptive name for the product series, eg "Nano Bitcoin Futures".
+	ContractExpiryTimezone *string             `json:"contract_expiry_timezone"`
+	GroupShortDescription  *string             `json:"group_short_description"` // Short version of the group_description, eg "Nano BTC".
+	RiskManagedBy          *RiskManagementType `json:"risk_managed_by"`
+	ContractExpiryType     *ContractExpiryType `json:"contract_expiry_type"`
+	PerpetualDetails       *PerpetualDetails   `json:"perpetual_details"`
+	ContractDisplayName    *string             `json:"contract_display_name"`
+}
+
+type BidAsk struct {
+	Price *string `json:"price"`
+	Size  *string `json:"size"`
+}
+
+type PriceBook struct {
+	ProductID string     `json:"product_id"` // The trading pair (e.g. 'BTC-USD').
+	Bids      []BidAsk   `json:"bids"`
+	Asks      []BidAsk   `json:"asks"`
+	Time      *time.Time `json:"time"`
+}
+
+// A timeframe a candle can represent.
+//
+//go:generate enumer -type=TimeGranularity -transform=snake-upper -json -text
+type TimeGranularity byte
+
+const (
+	TimeGranularityUnknownGranularity TimeGranularity = iota
+	TimeGranularityOneMinute
+	TimeGranularityFiveMinute
+	TimeGranularityFifteenMinute
+	TimeGranularityThirtyMinute
+	TimeGranularityOneHour
+	TimeGranularityTwoHour
+	TimeGranularitySixHour
+	TimeGranularityOneDay
+)
+
+type Candles struct {
+	Start  *string `json:"start"`  // Timestamp for bucket start time, in UNIX time.
+	Low    *string `json:"low"`    // Lowest price during the bucket interval.
+	High   *string `json:"high"`   // Highest price during the bucket interval.
+	Open   *string `json:"open"`   // Opening price (first trade) in the bucket interval.
+	Close  *string `json:"close"`  // Closing price (last trade) in the bucket interval.
+	Volume *string `json:"volume"` // Volume of trading activity during the bucket interval.
+}
+
+//go:generate enumer -type=ExpiringContractStatus -transform=snake-upper -trimprefix=ExpiringContractStatus -json -text
+type ExpiringContractStatus byte
+
+const (
+	ExpiringContractStatusUnknownExpiringContractStatus ExpiringContractStatus = iota
+	ExpiringContractStatusStatusUnexpired
+	ExpiringContractStatusStatusExpired
+	ExpiringContractStatusStatusAll
+)

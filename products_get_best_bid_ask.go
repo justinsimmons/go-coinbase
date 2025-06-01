@@ -16,7 +16,7 @@ type GetBestBidAskResponse struct {
 	PriceBooks []PriceBook `json:"pricebooks"`
 }
 
-type getBestBidAskOptions struct {
+type GetBestBidAskOptions struct {
 	ProductIDs []string `url:"product_ids,omitempty"`
 }
 
@@ -26,21 +26,14 @@ type getBestBidAskOptions struct {
 // https://docs.cdp.coinbase.com/coinbase-app/trade/reference/retailbrokerageapi_getbestbidask
 func (s *ProductsService) GetBestBidAsk(
 	ctx context.Context,
-	ids ...string,
+	opts *GetBestBidAskOptions,
 ) (*GetBestBidAskResponse, error) {
 
 	u := s.client.baseURL + "/api/v3/brokerage/best_bid_ask"
 
 	var resp GetBestBidAskResponse
 
-	err := s.client.get(
-		ctx,
-		u,
-		&getBestBidAskOptions{
-			ProductIDs: ids,
-		},
-		&resp,
-	)
+	err := s.client.get(ctx, u, opts, &resp)
 	if err != nil {
 		err = fmt.Errorf(
 			"failed to fetch best bid/ask for products '%v': %w",

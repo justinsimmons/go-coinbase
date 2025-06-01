@@ -13,52 +13,42 @@ import (
 	"time"
 )
 
-type TimeGranularity string
-
-const (
-	TimeGranularityUnknown        TimeGranularity = "UNKNOWN_GRANULARITY"
-	TimeGranularityOneMinute      TimeGranularity = "ONE_MINUTE"
-	TimeGranularityFiveMinutes    TimeGranularity = "FIVE_MINUTE"
-	TimeGranularityFifteenMinutes TimeGranularity = "FIFTEEN_MINUTE"
-	TimeGranularityThirtyMinutes  TimeGranularity = "THIRTY_MINUTE"
-	TimeGranularityOneHour        TimeGranularity = "ONE_HOUR"
-	TimeGranularityTwoHours       TimeGranularity = "TWO_HOUR"
-	TimeGranularitySixHours       TimeGranularity = "SIX_HOUR"
-	TimeGranularityOneDay         TimeGranularity = "ONE_DAY"
-)
-
 type GetProductCandlesOptions struct {
-	ProductID   string          `url:"-"`           // The trading pair.
-	Start       time.Time       `url:"start,unix"`  // Timestamp for starting range of aggregations.
-	End         time.Time       `url:"end,unix"`    // Timestamp for ending range of aggregations.
-	Granularity TimeGranularity `url:"granularity"` // The time slice value for each candle.
-}
-
-type Candles struct {
-	Start  *string `json:"start"`  // Timestamp for bucket start time, in UNIX time.
-	Low    *string `json:"low"`    // Lowest price during the bucket interval.
-	High   *string `json:"high"`   // Highest price during the bucket interval.
-	Open   *string `json:"open"`   // Opening price (first trade) in the bucket interval.
-	Close  *string `json:"close"`  // Closing price (last trade) in the bucket interval.
-	Volume *string `json:"volume"` // Volume of trading activity during the bucket interval.
+	ProductID   string          `url:"-"`               // The trading pair (e.g. 'BTC-USD').
+	Start       time.Time       `url:"start,unix"`      // The UNIX timestamp indicating the start of the time interval.
+	End         time.Time       `url:"end,unix"`        // The UNIX timestamp indicating the end of the time interval.
+	Granularity TimeGranularity `url:"granularity"`     // The timeframe each candle represents.
+	Limit       *int            `url:"limit,omitempty"` // The number of candle buckets to be returned. By default, returns 350 (max 350).
 }
 
 type getProductCandlesResponse struct {
 	Candles []Candles `json:"candles"`
 }
 
-// GetProductCandles gets rates for a single product by product ID, grouped in buckets.
-// id: The trading pair.
-// start: Timestamp for starting range of aggregations.
-// end: Timestamp for ending range of aggregations.
-// granularity: The time slice value for each candle.
-func (s *ProductsService) GetProductCandles(ctx context.Context, options GetProductCandlesOptions) ([]Candles, error) {
-	var candlesResp getProductCandlesResponse
+// Get rates for a single product by product ID, grouped in buckets.
+//
+// https://docs.cdp.coinbase.com/coinbase-app/trade/reference/retailbrokerageapi_getcandles
+func (s *ProductsService) GetProductCandles(
+	ctx context.Context,
+	opts *GetProductCandlesOptions,
+) ([]Candles, error) {
 
-	err := s.client.get(ctx, fmt.Sprintf("%s/api/v3/brokerage/products/%s/candles", s.client.baseURL, options.ProductID), &options, &candlesResp)
+	u := fmt.Sprintf(
+		"%s/api/v3/brokerage/products/%s/candles",
+		s.client.baseURL,
+		opts.ProductID,
+	)
+
+	var resp getProductCandlesResponse
+
+	err := s.client.get(ctx, u, opts, &resp)
 	if err != nil {
-		err = fmt.Errorf("failed to fetch get product candles for product '%s': %w", options.ProductID, err)
+		err = fmt.Errorf(
+			"failed to fetch get product candles for product '%s': %w",
+			opts.ProductID,
+			err,
+		)
 	}
 
-	return candlesResp.Candles, err
+	return resp.Candles, err
 }

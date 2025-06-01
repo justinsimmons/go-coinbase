@@ -12,15 +12,6 @@ import (
 	"fmt"
 )
 
-type ExpiringContractStatus string
-
-const (
-	ExpiringContractStatusUnknown   ExpiringContractStatus = "UNKNOWN_EXPIRING_CONTRACT_STATUS"
-	ExpiringContractStatusUnexpired ExpiringContractStatus = "STATUS_UNEXPIRED"
-	ExpiringContractStatusExpired   ExpiringContractStatus = "STATUS_EXPIRED"
-	ExpiringContractStatusAll       ExpiringContractStatus = "STATUS_ALL"
-)
-
 type ListProductsOptions struct {
 	Limit                  *int32                  `url:"limit,omitempty"`        // A limit describing how many products to return.
 	Offset                 *int32                  `url:"limit,omitempty"`        // Number of products to offset before returning.
@@ -35,13 +26,22 @@ type listProductsResponse struct {
 	NumberProducts int32     `json:"num_products"` // Number of products that were returned.
 }
 
-func (s *ProductsService) List(ctx context.Context, options *ListProductsOptions) ([]Product, error) {
-	var productsResp listProductsResponse
+// Get a list of the available currency pairs for trading.
+//
+// https://docs.cdp.coinbase.com/coinbase-app/trade/reference/retailbrokerageapi_getproducts
+func (s *ProductsService) List(
+	ctx context.Context,
+	opts *ListProductsOptions,
+) ([]Product, error) {
 
-	err := s.client.get(ctx, s.client.baseURL+"/api/v3/brokerage/products", options, &productsResp)
+	u := s.client.baseURL + "/api/v3/brokerage/products"
+
+	var resp listProductsResponse
+
+	err := s.client.get(ctx, u, opts, &resp)
 	if err != nil {
 		err = fmt.Errorf("failed to fetch list of products: %w", err)
 	}
 
-	return productsResp.Products, err
+	return resp.Products, err
 }

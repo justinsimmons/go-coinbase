@@ -60,3 +60,7 @@ type PaymentMethodsService service
 // PortfoliosService handles communication with the portfolios related
 // methods of the Coinbase Advanced Trade API.
 type PortfoliosService service
+
+// ProductsService handles communication with the products related
+// methods of the Coinbase Advanced Trade API.
+type ProductsService service
