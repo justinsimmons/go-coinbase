@@ -14,7 +14,7 @@ import (
 	"fmt"
 )
 
-type createPortfolioRequest struct {
+type CreatePortfolioOptions struct {
 	Name string `json:"name"`
 }
 
@@ -22,16 +22,27 @@ type createPortfolioResponse struct {
 	Portfolio *Portfolio `json:"portfolio"`
 }
 
-// Create creates a portfolio.
-func (s *PortfoliosService) Create(ctx context.Context, name string) (*Portfolio, error) {
-	b, err := json.Marshal(createPortfolioRequest{Name: name})
+// Create a portfolio.
+//
+// https://docs.cdp.coinbase.com/coinbase-app/trade/reference/retailbrokerageapi_createportfolio
+func (s *PortfoliosService) Create(
+	ctx context.Context,
+	opts *CreatePortfolioOptions,
+) (*Portfolio, error) {
+
+	u := s.client.baseURL + "/api/v3/brokerage/portfolios"
+
+	b, err := json.Marshal(opts)
 	if err != nil {
-		return nil, fmt.Errorf("failed to marshal create portfolio request body to JSON: %w", err)
+		return nil, fmt.Errorf(
+			"failed to marshal create portfolio request body to JSON: %w",
+			err,
+		)
 	}
 
 	var portfolioResp createPortfolioResponse
 
-	err = s.client.post(ctx, s.client.baseURL+"/api/v3/brokerage/portfolios", bytes.NewBuffer(b), &portfolioResp)
+	err = s.client.post(ctx, u, bytes.NewBuffer(b), &portfolioResp)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create portfolio: %w", err)
 	}

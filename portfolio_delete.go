@@ -14,11 +14,27 @@ import (
 	"github.com/google/uuid"
 )
 
-// Delete deletes a portfolio by portfolio ID.
-func (s *PortfoliosService) Delete(ctx context.Context, id uuid.UUID) error {
-	err := s.client.delete(ctx, fmt.Sprintf("%s/api/v3/brokerage/portfolios/%s", s.client.baseURL, id.String()))
+// Delete portfolio.
+//
+// https://docs.cdp.coinbase.com/coinbase-app/trade/reference/retailbrokerageapi_deleteportfolio
+func (s *PortfoliosService) Delete(
+	ctx context.Context,
+	id uuid.UUID,
+) error {
+
+	u := fmt.Sprintf(
+		"%s/api/v3/brokerage/portfolios/%s",
+		s.client.baseURL,
+		id.String(),
+	)
+
+	err := s.client.delete(ctx, u)
 	if err != nil {
-		return fmt.Errorf("failed to delete protfolio '%s': %w", id.String(), err)
+		return fmt.Errorf(
+			"failed to delete portfolio '%s': %w",
+			id.String(),
+			err,
+		)
 	}
 
 	return nil

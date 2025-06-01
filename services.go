@@ -56,3 +56,7 @@ type PerpetualsService service
 // PaymentMethodsService handles communication with the payment method related
 // methods of the Coinbase Advanced Trade API.
 type PaymentMethodsService service
+
+// PortfoliosService handles communication with the portfolios related
+// methods of the Coinbase Advanced Trade API.
+type PortfoliosService service

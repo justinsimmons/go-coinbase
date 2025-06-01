@@ -13,21 +13,29 @@ import (
 )
 
 type ListPortfoliosOptions struct {
-	PortfolioType *PortfolioType `url:"portfolio_type,omitempty"`
+	PortfolioType *PortfolioType `url:"portfolio_type,omitempty"` // Only returns portfolios matching this portfolio type.
 }
 
 type ListPortfoliosResponse struct {
 	Portfolios []Portfolio `json:"portfolios"`
 }
 
-// List gets a list of all portfolios of a user.
-func (s *PortfoliosService) List(ctx context.Context, options *ListPortfoliosOptions) (*ListPortfoliosResponse, error) {
-	var portfolios ListPortfoliosResponse
+// Get all portfolios of a user.
+//
+// https://docs.cdp.coinbase.com/coinbase-app/trade/reference/retailbrokerageapi_getportfolios
+func (s *PortfoliosService) List(
+	ctx context.Context,
+	options *ListPortfoliosOptions,
+) ([]Portfolio, error) {
 
-	err := s.client.get(ctx, s.client.baseURL+"/api/v3/brokerage/portfolios", options, &portfolios)
+	u := s.client.baseURL + "/api/v3/brokerage/portfolios"
+
+	var resp ListPortfoliosResponse
+
+	err := s.client.get(ctx, u, options, &resp)
 	if err != nil {
 		err = fmt.Errorf("failed to get list of portfolios: %w", err)
 	}
 
-	return &portfolios, err
+	return resp.Portfolios, err
 }

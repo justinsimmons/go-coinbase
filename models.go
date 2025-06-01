@@ -20,10 +20,24 @@ type AccountType byte
 
 const (
 	AccountTypeUnspecified AccountType = iota
-	AccountTypeCrypto
+	AccountTypeWallet
 	AccountTypeFiat
 	AccountTypeVault
+	AccountTypeCollateral
+	AccountTypeCrypto
+	AccountTypeDefiYeild
+	AccountTypeLoanManagement
+	AccountTypeMultisig
+	AccountTypeMultisigVault
+	AccountTypeDerivativesTransfer
+	AccountTypeDerivativesEquity
+	AccountTypeStakedFunds
 	AccountTypePerpFutures
+	AccountTypePerpFuturesIsolated
+	AccountTypeLentFunds
+	AccountTypePerpFuturesCollateral
+	AccountTypeDerivativesCash
+	AccountTypeClawbackDebt
 )
 
 // Coinbase platform the account is on.
@@ -1090,4 +1104,121 @@ type PerpetualsPortfolioBalance struct {
 	PortfolioUUID        *string             `json:"portfolio_uuid,omitempty"`
 	Balances             []PerpetualsBalance `json:"balances,omitempty"`
 	IsMarginLimitReached bool                `json:"is_margin_limit_reached,omitempty"`
+}
+
+//go:generate enumer -type=PortfolioType -transform=snake-upper -json -text
+type PortfolioType byte
+
+const (
+	PortfolioTypeUndefined PortfolioType = iota
+	PortfolioTypeDefault
+	PortfolioTypeConsumer
+	PortfolioTypeIntx
+)
+
+// Futures side of a trade.
+//
+//go:generate enumer -type=FuturesPositionSide -transform=snake-upper -json -text
+type FuturesPositionSide byte
+
+const (
+	FuturesPositionSideUnspecified FuturesPositionSide = iota
+	FuturesPositionSideLong
+	FuturesPositionSideShort
+)
+
+// Coinbase Portfolio.
+type Portfolio struct {
+	Name    *string        `json:"name,omitempty"`
+	UUID    *string        `json:"uuid,omitempty"`
+	Type    *PortfolioType `json:"type,omitempty"` // PortfolioType defines the type of Portfolio.
+	Deleted *bool          `json:"deleted,omitempty"`
+}
+
+// Balance within a portfolio.
+type PortfolioBalances struct {
+	TotalBalance               *AvailableBalance `json:"total_balance"`                 // Represents a monetary amount.
+	TotalFuturesBalance        *AvailableBalance `json:"total_futures_balance"`         // Represents a monetary amount.
+	TotalCashEquivalentBalance *AvailableBalance `json:"total_cash_equivalent_balance"` // Represents a monetary amount.
+	TotalCryptoBalance         *AvailableBalance `json:"total_crypto_balance"`          // Represents a monetary amount.
+	FuturesUnrealizedPNL       *AvailableBalance `json:"futures_unrealized_pnl"`        // Represents a monetary amount.
+	PerpUnrealizedPNL          *AvailableBalance `json:"perp_unrealized_pnl"`           // Represents a monetary amount.
+
+}
+
+type SpotPosition struct {
+	Asset                     *string           `json:"asset,omitempty"`
+	AccountUUID               *string           `json:"account_uuid,omitempty"`
+	TotalBalanceFiat          *float32          `json:"total_balance_fiat,omitempty"`
+	TotalBalanceCrypto        *float32          `json:"total_balance_crypto,omitempty"`
+	AvailableToTradeFiat      *float32          `json:"available_to_trade_fiat,omitempty"`
+	Allocation                *float32          `json:"allocation,omitempty"`
+	CostBasis                 *AvailableBalance `json:"cost_basis,omitempty"`
+	AssetImgURL               *string           `json:"asset_img_url,omitempty"`
+	IsCash                    *bool             `json:"is_cash,omitempty"`
+	AverageEntryPrice         *AvailableBalance `json:"average_entry_price,omitempty"`
+	AssetUUID                 *string           `json:"asset_uuid,omitempty"`
+	AvailableToTradeCrypto    *float32          `json:"available_to_trade_crypto,omitempty"`
+	UnrealizedPNL             *float32          `json:"unrealized_pnl,omitempty"`
+	AvailableToTransferFiat   *float32          `json:"available_to_transfer_fiat,omitempty"`
+	AvailableToTransferCrypto *float32          `json:"available_to_transfer_crypto,omitempty"`
+	AssetColor                *string           `json:"asset_color,omitempty"`
+	AccountType               *AccountType      `json:"account_type,omitempty"`
+}
+
+type PerpPosition struct {
+	ProductID             *string              `json:"product_id,omitempty"`
+	ProductUUID           *string              `json:"product_uuid,omitempty"`
+	Symbol                *string              `json:"symbol,omitempty"`
+	AssetImageURL         *string              `json:"asset_image_url,omitempty"`
+	VWAP                  *UserNativeCurrency  `json:"vwap,omitempty"`
+	PositionSide          *FuturesPositionSide `json:"position_side,omitempty"`
+	NetSize               *string              `json:"net_size,omitempty"`
+	BuyOrderSize          *string              `json:"buy_order_size,omitempty"`
+	SellOrderSize         *string              `json:"sell_order_size,omitempty"`
+	IMContribution        *string              `json:"im_contribution,omitempty"`
+	UnrealizedPNL         *UserNativeCurrency  `json:"unrealized_pnl,omitempty"`
+	MarkPrice             *UserNativeCurrency  `json:"mark_price,omitempty"`
+	LiquidationPrice      *UserNativeCurrency  `json:"liquidation_price,omitempty"`
+	Leverage              *string              `json:"leverage,omitempty"`
+	IMNotional            *UserNativeCurrency  `json:"im_notional,omitempty"`
+	MMNotional            *UserNativeCurrency  `json:"mm_notional,omitempty"`
+	PositionNotional      *UserNativeCurrency  `json:"position_notional,omitempty"`
+	MarginType            *MarginType          `json:"margin_type,omitempty"`
+	LiquidationBuffer     *string              `json:"liquidation_buffer,omitempty"`
+	LiquidationPercentage *string              `json:"liquidation_percentage,omitempty"`
+	AssetColor            *string              `json:"asset_color,omitempty"`
+}
+
+type UserNativeCurrency struct {
+	UserNativeCurrency *AvailableBalance `json:"userNativeCurrency,omitempty"` // Represents a monetary amount.
+	RawCurrency        *AvailableBalance `json:"rawCurrency,omitempty"`        // Represents a monetary amount.
+}
+
+type FuturesBreakdownPosition struct {
+	ProductID       string              `json:"product_id,omitempty"`
+	ContractSize    string              `json:"contract_size,omitempty"`
+	Side            FuturesPositionSide `json:"side,omitempty"`
+	Amount          string              `json:"amount,omitempty"`
+	AvgEntryPrice   string              `json:"avg_entry_price,omitempty"`
+	CurrentPrice    string              `json:"current_price,omitempty"`
+	UnrealizedPNL   string              `json:"unrealized_pnl,omitempty"`
+	Expiry          time.Time           `json:"expiry,omitempty"`
+	UnderlyingAsset string              `json:"underlying_asset,omitempty"`
+	AssetImgURL     string              `json:"asset_img_url,omitempty"`
+	ProductName     string              `json:"product_name,omitempty"`
+	Venue           string              `json:"venue,omitempty"`
+	NotionalValue   string              `json:"notional_value,omitempty"`
+	AssetColor      string              `json:"asset_color,omitempty"`
+	LastTradedAt    time.Time           `json:"last_traded_at,omitempty"`
+}
+
+// PortfolioBreakdown is a breakdown of a portfolio, all balances, and all
+// positions within a portfolio.
+type PortfolioBreakdown struct {
+	Portfolio        *Portfolio                 `json:"portfolio,omitempty"`
+	Balances         *PortfolioBalances         `json:"portfolio_balances,omitempty"`
+	SpotPositions    []SpotPosition             `json:"spot_positions"`
+	PerpPositions    []PerpPosition             `json:"perp_positions"`
+	FuturesPositions []FuturesBreakdownPosition `json:"futures_positions"`
 }

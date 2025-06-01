@@ -19,7 +19,7 @@ type BidAsk struct {
 }
 
 type PriceBook struct {
-	ProductID string     `json:"product_id"`
+	ProductID string     `json:"product_id"` // The trading pair (e.g. 'BTC-USD').
 	Bids      []BidAsk   `json:"bids"`
 	Asks      []BidAsk   `json:"asks"`
 	Time      *time.Time `json:"time"`

@@ -16,21 +16,38 @@ type GetBestBidAskResponse struct {
 	PriceBooks []PriceBook `json:"pricebooks"`
 }
 
-// GetBestBidAsk gets the best bid/ask for all products. A subset of all products can be
-// returned instead by using the product_ids input.
-func (s *ProductsService) GetBestBidAsk(ctx context.Context, ids ...string) (*GetBestBidAskResponse, error) {
-	options := struct {
-		ProductIDs []string `url:"product_ids"`
-	}{
-		ProductIDs: ids,
-	}
+type getBestBidAskOptions struct {
+	ProductIDs []string `url:"product_ids,omitempty"`
+}
 
-	var bidAsk GetBestBidAskResponse
+// GetBestBidAsk gets the best bid/ask for all products. A subset of all
+// products can be returned instead by using the product_ids input.
+//
+// https://docs.cdp.coinbase.com/coinbase-app/trade/reference/retailbrokerageapi_getbestbidask
+func (s *ProductsService) GetBestBidAsk(
+	ctx context.Context,
+	ids ...string,
+) (*GetBestBidAskResponse, error) {
 
-	err := s.client.get(ctx, s.client.baseURL+"/api/v3/brokerage/best_bid_ask", &options, &bidAsk)
+	u := s.client.baseURL + "/api/v3/brokerage/best_bid_ask"
+
+	var resp GetBestBidAskResponse
+
+	err := s.client.get(
+		ctx,
+		u,
+		&getBestBidAskOptions{
+			ProductIDs: ids,
+		},
+		&resp,
+	)
 	if err != nil {
-		err = fmt.Errorf("failed to fetch best bid/ask for products '%v': %w", ids, err)
+		err = fmt.Errorf(
+			"failed to fetch best bid/ask for products '%v': %w",
+			ids,
+			err,
+		)
 	}
 
-	return &bidAsk, err
+	return &resp, err
 }

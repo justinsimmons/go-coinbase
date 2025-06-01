@@ -12,26 +12,44 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-
-	"github.com/google/uuid"
 )
 
 type EditPortfolioOptions struct {
-	Name string `json:"name"`
+	PortfolioUUID string `json:"-"`    // The portfolio UUID.
+	Name          string `json:"name"` // The name of the portfolio.
 }
 
-// Edit modifies a portfolio by portfolio ID.
-func (s *PortfoliosService) Edit(ctx context.Context, id uuid.UUID, options EditPortfolioOptions) (*Portfolio, error) {
-	b, err := json.Marshal(options)
+// Edit a portfolio.
+//
+// https://docs.cdp.coinbase.com/coinbase-app/trade/reference/retailbrokerageapi_editportfolio
+func (s *PortfoliosService) Edit(
+	ctx context.Context,
+	opts *EditPortfolioOptions,
+) (*Portfolio, error) {
+
+	u := fmt.Sprintf(
+		"%s/api/v3/brokerage/portfolios/%s",
+		s.client.baseURL,
+		id.String(),
+	)
+
+	b, err := json.Marshal(opts)
 	if err != nil {
-		return nil, fmt.Errorf("failed to marshal edit portfolio options to JSON: %w", err)
+		return nil, fmt.Errorf(
+			"failed to marshal edit portfolio options to JSON: %w",
+			err,
+		)
 	}
 
 	var portfolio Portfolio
 
-	err = s.client.put(ctx, fmt.Sprintf("%s/api/v3/brokerage/portfolios/%s", s.client.baseURL, id.String()), bytes.NewReader(b), &portfolio)
+	err = s.client.put(ctx, u, bytes.NewReader(b), &portfolio)
 	if err != nil {
-		return nil, fmt.Errorf("failed to edit protfolio '%s': %w", id.String(), err)
+		return nil, fmt.Errorf(
+			"failed to edit protfolio '%s': %w",
+			id.String(),
+			err,
+		)
 	}
 
 	return &portfolio, nil

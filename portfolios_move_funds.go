@@ -17,9 +17,9 @@ import (
 )
 
 type PortfolioMoveFundsOptions struct {
-	Funds               Funds     `json:"funds"`                 // Represents a monetary amount.
-	SourcePortfolioUUID uuid.UUID `json:"source_portfolio_uuid"` // UUID of the portfolio to transfer funds from.
-	TargetPortfolioUUID uuid.UUID `json:"target_portfolio_uuid"` // UUID of the portfolio to transfer funds to.
+	Funds               AvailableBalance `json:"funds"`                 // The amount to be moved to the specified portfolio.
+	SourcePortfolioUUID uuid.UUID        `json:"source_portfolio_uuid"` // UUID of the portfolio to transfer funds from.
+	TargetPortfolioUUID uuid.UUID        `json:"target_portfolio_uuid"` // UUID of the portfolio to transfer funds to.
 }
 
 type PorfoliosMoveFundsResponse struct {
@@ -27,16 +27,27 @@ type PorfoliosMoveFundsResponse struct {
 	TargetPortfolioUUID *uuid.UUID `json:"target_portfolio_uuid"` // UUID of the portfolio the funds were transfered to.
 }
 
-// MoveFunds transfers funds between portfolios.
-func (s *PortfoliosService) MoveFunds(ctx context.Context, options PortfolioMoveFundsOptions) (*PorfoliosMoveFundsResponse, error) {
-	b, err := json.Marshal(options)
+// Move funds between portfolios.
+//
+// https://docs.cdp.coinbase.com/coinbase-app/trade/reference/retailbrokerageapi_moveportfoliofunds
+func (s *PortfoliosService) MoveFunds(
+	ctx context.Context,
+	opts *PortfolioMoveFundsOptions,
+) (*PorfoliosMoveFundsResponse, error) {
+
+	u := s.client.baseURL + "/api/v3/brokerage/portfolios/move_funds"
+
+	b, err := json.Marshal(opts)
 	if err != nil {
-		return nil, fmt.Errorf("failed to marshal move portfolio funds request body to JSON: %w", err)
+		return nil, fmt.Errorf(
+			"failed to marshal move portfolio funds request body to JSON: %w",
+			err,
+		)
 	}
 
 	var resp PorfoliosMoveFundsResponse
 
-	err = s.client.post(ctx, s.client.baseURL+"/api/v3/brokerage/portfolios/move_funds", bytes.NewReader(b), &resp)
+	err = s.client.post(ctx, u, bytes.NewReader(b), &resp)
 	if err != nil {
 		return nil, fmt.Errorf("failed to move portfolio funds: %w", err)
 	}
